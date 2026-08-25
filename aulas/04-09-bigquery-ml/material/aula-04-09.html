@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDM 2026.2 — BigQuery ML | Guia de estudos</title>
+<style>
+:root{
+  --azul-escuro:#44546A;
+  --azul:#4472C4;
+  --laranja:#ED7D31;
+  --cinza:#E7E6E6;
+  --tinta:#1f2733;
+  --papel:#ffffff;
+  --fundo:#f4f5f7;
+  --codigo:#1e2733;
+  --largura:830px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--fundo);
+  color:var(--tinta);
+  font-family:Calibri,"Segoe UI",Candara,Optima,sans-serif;
+  font-size:17px;
+  line-height:1.62;
+}
+
+/* ---------- layout ---------- */
+#capa{
+  background:var(--azul-escuro);
+  color:#fff;
+  padding:64px 40px 56px;
+}
+#capa .interno{max-width:var(--largura);margin:0 auto}
+#capa .marca{
+  font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:#b9c4d4;margin-bottom:28px;
+}
+#capa h1{
+  font-family:"Calibri Light",Calibri,sans-serif;font-weight:300;
+  font-size:44px;line-height:1.15;margin:0 0 14px;
+}
+#capa .tese{
+  font-size:20px;color:#dbe3ee;font-weight:300;margin:0 0 30px;
+  border-left:3px solid var(--laranja);padding-left:16px;
+}
+#capa .meta{font-size:14px;color:#a9b6c8}
+#capa .meta b{color:#fff;font-weight:600}
+
+#barra{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.93);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid #dde1e7;
+  padding:9px 24px;
+}
+#barra .interno{
+  max-width:var(--largura);margin:0 auto;
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+}
+#barra .prog{
+  flex:1;min-width:120px;height:6px;background:var(--cinza);
+  border-radius:3px;overflow:hidden;
+}
+#barra .prog i{display:block;height:100%;width:0;background:var(--laranja);transition:width .3s}
+#barra .rot{font-size:13px;color:#5d6b7d;white-space:nowrap}
+
+button.acao{
+  font-family:inherit;font-size:13px;cursor:pointer;
+  border:1px solid var(--azul);background:#fff;color:var(--azul);
+  padding:5px 13px;border-radius:5px;transition:.15s;
+}
+button.acao:hover{background:var(--azul);color:#fff}
+button.acao.on{background:var(--azul);color:#fff}
+
+main{max-width:var(--largura);margin:0 auto;padding:0 24px 120px}
+
+section{
+  background:var(--papel);border:1px solid #e3e6ea;border-radius:10px;
+  padding:34px 38px;margin:26px 0;
+  box-shadow:0 1px 3px rgba(30,40,60,.05);
+}
+section>h2{
+  font-family:"Calibri Light",Calibri,sans-serif;font-weight:300;
+  font-size:31px;margin:0 0 6px;color:var(--azul-escuro);
+}
+section>h2 .num{
+  display:inline-block;min-width:34px;height:34px;line-height:34px;
+  text-align:center;background:var(--azul-escuro);color:#fff;
+  border-radius:6px;font-size:16px;font-weight:600;margin-right:12px;
+  font-family:Calibri,sans-serif;vertical-align:3px;
+}
+/* a assinatura do template: uma tese de uma linha embaixo do titulo */
+section>h2+p.tese{
+  margin:0 0 22px;padding:0 0 18px 46px;
+  border-bottom:1px solid var(--cinza);
+  color:var(--laranja);font-size:18px;font-style:italic;
+}
+section .selo{
+  display:inline-block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 9px;border-radius:4px;margin-left:8px;vertical-align:5px;font-style:normal;
+}
+.selo.mao{background:#e8f0ff;color:var(--azul);border:1px solid #c3d6f7}
+.selo.ver{background:#fdf0e6;color:#b45a15;border:1px solid #f5cfae}
+.selo.antes{background:#eef1f4;color:#5d6b7d;border:1px solid #d8dde3}
+
+h3{font-size:19px;color:var(--azul-escuro);margin:30px 0 8px}
+p{margin:12px 0}
+ul,ol{margin:12px 0;padding-left:22px}
+li{margin:6px 0}
+a{color:var(--azul)}
+
+/* ---------- codigo ---------- */
+.bloco{margin:18px 0;border:1px solid #2c3846;border-radius:8px;overflow:hidden}
+.bloco header{
+  background:#2c3846;color:#c9d4e0;font-size:12.5px;
+  padding:7px 14px;display:flex;justify-content:space-between;align-items:center;
+}
+.bloco header span{letter-spacing:.06em}
+.bloco header button{
+  font-family:inherit;font-size:12px;cursor:pointer;
+  background:transparent;border:1px solid #55677d;color:#c9d4e0;
+  padding:3px 10px;border-radius:4px;transition:.15s;
+}
+.bloco header button:hover{background:#55677d;color:#fff}
+.bloco header button.ok{border-color:#7fbf6a;color:#9ede86}
+pre{
+  margin:0;padding:16px 18px;background:var(--codigo);color:#e6edf3;
+  font-family:"SF Mono",Menlo,Consolas,"Courier New",monospace;
+  font-size:13.5px;line-height:1.6;overflow-x:auto;
+}
+code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.92em}
+p code,li code,td code{background:#eef1f5;padding:1px 5px;border-radius:3px;color:#2c3e57}
+.k{color:#ff9d6b}   /* keyword */
+.f{color:#7fd4ff}   /* funcao  */
+.s{color:#9ee6a0}   /* string  */
+.c{color:#7d8fa3;font-style:italic} /* comentario */
+
+/* ---------- caixas ---------- */
+.nota,.alerta,.chave{
+  border-left:4px solid;border-radius:0 7px 7px 0;
+  padding:14px 18px;margin:20px 0;font-size:16px;
+}
+.nota{border-color:var(--azul);background:#f2f6fd}
+.alerta{border-color:var(--laranja);background:#fef6f0}
+.chave{border-color:var(--azul-escuro);background:#f3f5f8;font-size:18px}
+.chave b{color:var(--azul-escuro)}
+
+table{border-collapse:collapse;width:100%;margin:18px 0;font-size:15.5px}
+th{background:var(--azul-escuro);color:#fff;text-align:left;padding:9px 12px;font-weight:600}
+td{border-bottom:1px solid #e3e6ea;padding:9px 12px;vertical-align:top}
+tr:nth-child(even) td{background:#fafbfc}
+
+/* ---------- interativos ---------- */
+details{
+  border:1px solid #d8dde3;border-radius:7px;margin:16px 0;background:#fbfcfd;
+}
+details summary{
+  cursor:pointer;padding:12px 16px;font-weight:600;color:var(--azul-escuro);
+  list-style:none;user-select:none;
+}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"▸ ";color:var(--laranja)}
+details[open] summary::before{content:"▾ "}
+details[open] summary{border-bottom:1px solid #e3e6ea}
+details .corpo{padding:4px 16px 14px}
+details.spoiler{border-color:#f0c9a8;background:#fffaf5}
+details.spoiler summary{color:#b45a15}
+details.spoiler summary::after{
+  content:" — não abra antes de rodar";font-weight:400;font-size:13px;color:#a08060;
+}
+
+.check{
+  display:flex;gap:11px;align-items:flex-start;
+  background:#f3f5f8;border:1px solid #dde2e8;border-radius:7px;
+  padding:13px 16px;margin:16px 0;cursor:pointer;
+}
+.check input{margin-top:4px;width:17px;height:17px;accent-color:var(--laranja);cursor:pointer}
+.check b{color:var(--azul-escuro)}
+.check.feito{background:#f0f8ee;border-color:#c7e3bd}
+
+.pergunta{
+  background:#fff;border:1px dashed var(--azul);border-radius:7px;
+  padding:16px 18px;margin:20px 0;
+}
+.pergunta .q{font-weight:600;color:var(--azul-escuro);margin:0 0 6px}
+
+/* ---------- modo projecao ---------- */
+body.projecao{font-size:22px}
+body.projecao main{max-width:1180px}
+body.projecao section{padding:44px 50px}
+body.projecao section>h2{font-size:42px}
+body.projecao section>h2+p.tese{font-size:25px}
+body.projecao pre{font-size:19px;line-height:1.65}
+body.projecao table{font-size:20px}
+body.projecao .chave{font-size:26px}
+
+/* ---------- impressao ---------- */
+@media print{
+  body{background:#fff;font-size:11pt}
+  #barra,button,.check input{display:none!important}
+  #capa{background:#fff;color:var(--azul-escuro);padding:0 0 24pt;
+        border-bottom:3px solid var(--azul-escuro)}
+  #capa h1{font-size:26pt}#capa .tese{color:#444}#capa .meta{color:#666}
+  #capa .meta b{color:#000}#capa .marca{color:#888}
+  main{max-width:none;padding:0}
+  section{border:none;box-shadow:none;padding:0;margin:22pt 0;page-break-inside:avoid}
+  pre{background:#f4f5f7;color:#111;border:1px solid #ccc}
+  .c{color:#777}.k,.f,.s{color:#111}
+  details{border:1px solid #ccc}
+  details:not([open])>.corpo{display:block}
+  details summary::after{content:""}
+  a{color:#000;text-decoration:none}
+}
+
+@media(max-width:640px){
+  section{padding:24px 20px}
+  #capa{padding:44px 22px 40px}
+  #capa h1{font-size:31px}
+}
+</style>
+</head>
+<body>
+
+<header id="capa">
+  <div class="interno">
+    <div class="marca">INF · Instituto de Informática · UFG — Processamento de Dados Massivos 2026.2</div>
+    <h1>BigQuery ML<br>Treinar modelo sem sair do SQL</h1>
+    <p class="tese">O <code>CREATE MODEL</code> é uma linha. Tudo que decide se ele vale alguma coisa acontece antes dele.</p>
+    <div class="meta">
+      Aula de <b>04/09/2026</b> &nbsp;·&nbsp; Prof. <b>Guilherme</b> &nbsp;·&nbsp;
+      Dataset: <b>1.000 anúncios de imóveis</b> (Goiânia) &nbsp;·&nbsp; Guia de estudos e referência para o Trabalho 1
+    </div>
+  </div>
+</header>
+
+<nav id="barra">
+  <div class="interno">
+    <span class="rot" id="rotulo">0 de 5 etapas</span>
+    <div class="prog"><i id="barraProg"></i></div>
+    <button class="acao" id="btnProj" title="Aumenta tudo para projetar em sala">Modo projeção</button>
+    <button class="acao" onclick="window.print()" title="Ctrl+P — sai um PDF">Salvar PDF</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============================================================ -->
+<section id="s0">
+  <h2><span class="num">0</span>Antes de começar</h2>
+  <p class="tese">Você já fez isso em 21/08. Hoje o dado é mais difícil.</p>
+
+  <p>Nas aulas do Sávio você levou um arquivo do <b>Cloud Storage</b> até a camada <b>Gold</b> no BigQuery.
+  Hoje a pergunta é a que fecha o ciclo:</p>
+
+  <div class="chave">
+    Para treinar um modelo em cima dessa Gold, eu preciso de qual outra ferramenta?<br>
+    <b>Resposta da aula: nenhuma.</b>
+  </div>
+
+  <p>Todo o conteúdo de hoje é o mesmo esqueleto de três comandos, repetido:</p>
+
+  <div class="bloco">
+    <header><span>o esqueleto</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">CREATE MODEL</span> ...   <span class="c">-- treina</span>
+<span class="f">ML.EVALUATE</span>(...)   <span class="c">-- vale alguma coisa?</span>
+<span class="f">ML.PREDICT</span>(...)    <span class="c">-- usa</span></pre>
+  </div>
+
+  <p>Se em algum momento você se perder no detalhe, volte aqui. É sempre esse desenho.</p>
+
+  <h3>O que você precisa ter aberto</h3>
+  <ul>
+    <li>BigQuery Studio no console do GCP, no projeto da disciplina</li>
+    <li>O dataset com a tabela <code>imoveis_bronze</code> já criada pelo professor</li>
+  </ul>
+
+  <div class="alerta">
+    <b>Os scripts usam <code>SEU_PROJETO.SEU_DATASET</code>.</b>
+    Troque pelos nomes reais do projeto da turma antes de rodar, ou o BigQuery vai reclamar
+    de tabela não encontrada.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="s1">
+  <h2><span class="num">1</span>Bronze: o dado do jeito que ele chega<span class="selo antes">preparação do ambiente</span></h2>
+  <p class="tese">O dado bruto não vem em tabela. Vem em JSON.</p>
+
+  <p>A camada Bronze é uma <b>External Table</b>: o CSV continua morando no bucket,
+  o BigQuery só aprendeu a lê-lo. Nada foi copiado.</p>
+
+  <div class="bloco">
+    <header><span>bronze_00_setup.sql — o professor já rodou</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">CREATE OR REPLACE EXTERNAL TABLE</span> `SEU_PROJETO.SEU_DATASET.imoveis_bronze`
+(
+  id_anuncio        <span class="k">STRING</span>,
+  data_atualizacao  <span class="k">STRING</span>,
+  data_insercao     <span class="k">STRING</span>,
+  listing           <span class="k">STRING</span>   <span class="c">-- &lt;&lt;&lt; o JSON inteiro mora aqui dentro</span>
+)
+<span class="k">OPTIONS</span> (
+  format                = <span class="s">'CSV'</span>,
+  uris                  = [<span class="s">'gs://SEU_BUCKET/imoveis/aula-pdm.csv'</span>],
+  skip_leading_rows     = 1,
+  quote                 = <span class="s">'"'</span>,
+  allow_quoted_newlines = <span class="k">TRUE</span>,
+  ignore_unknown_values = <span class="k">TRUE</span>
+);</pre>
+  </div>
+
+  <p>Agora olhe <b>um</b> anúncio:</p>
+
+  <div class="bloco">
+    <header><span>olhe uma linha</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span>
+  id_anuncio,
+  <span class="f">LENGTH</span>(listing) <span class="k">AS</span> tamanho_do_json,
+  listing
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_bronze`
+<span class="k">LIMIT</span> 1;</pre>
+  </div>
+
+  <p>São aproximadamente <b>14 mil caracteres</b> numa célula só. Chaves dentro de chaves,
+  listas, acento, HTML, emoji.</p>
+
+  <div class="pergunta">
+    <p class="q">Pergunta para você responder agora, antes de continuar:</p>
+    <p>Como você treinaria um modelo com <b>isso</b>?</p>
+  </div>
+
+  <div class="nota">
+    <b>Por que isso importa.</b> Dado do mundo real quase nunca chega em tabela.
+    Chega em JSON de API, em log, em documento. A habilidade de abrir isso
+    dentro do warehouse — sem exportar para lugar nenhum — é o que a próxima
+    etapa ensina.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="s2">
+  <h2><span class="num">2</span>Silver: o JSON vira tabela<span class="selo mao">mão na massa</span></h2>
+  <p class="tese">Duas funções resolvem 90% de qualquer JSON: uma para campo, uma para lista.</p>
+
+  <h3>Passo 1 — pegar um campo</h3>
+  <div class="bloco">
+    <header><span>JSON_VALUE</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span>
+  id_anuncio,
+  <span class="f">JSON_VALUE</span>(listing, <span class="s">'$.address.city'</span>)          <span class="k">AS</span> cidade,
+  <span class="f">JSON_VALUE</span>(listing, <span class="s">'$.address.neighborhood'</span>)  <span class="k">AS</span> bairro,
+  <span class="f">JSON_VALUE</span>(listing, <span class="s">'$.usableAreas[0]'</span>)        <span class="k">AS</span> area_util
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_bronze`
+<span class="k">LIMIT</span> 10;</pre>
+  </div>
+  <p>O <code>$</code> é a raiz do documento. O ponto desce um nível.
+  O <code>[0]</code> pega o primeiro item quando o campo é uma lista.</p>
+
+  <h3>Passo 2 — quando o campo é uma <i>lista de objetos</i></h3>
+  <p>Este é o conceito que trava todo mundo. O campo <code>pricingInfos</code> não é um valor:
+  é uma <b>lista</b>, porque o mesmo anúncio pode estar à venda <i>e</i> para alugar.
+  Você precisa dizer qual dos dois quer.</p>
+
+  <div class="bloco">
+    <header><span>JSON_QUERY_ARRAY + UNNEST — o pulo do gato</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span>
+  id_anuncio,
+  (<span class="k">SELECT</span> <span class="f">JSON_VALUE</span>(p, <span class="s">'$.price'</span>)
+   <span class="k">FROM</span> <span class="f">UNNEST</span>(<span class="f">JSON_QUERY_ARRAY</span>(listing, <span class="s">'$.pricingInfos'</span>)) <span class="k">AS</span> p
+   <span class="k">WHERE</span> <span class="f">JSON_VALUE</span>(p, <span class="s">'$.businessType'</span>) = <span class="s">'SALE'</span>
+   <span class="k">LIMIT</span> 1) <span class="k">AS</span> preco_venda
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_bronze`
+<span class="k">LIMIT</span> 10;</pre>
+  </div>
+
+  <table>
+    <tr><th>Função</th><th>Serve para</th><th>Devolve</th></tr>
+    <tr><td><code>JSON_VALUE</code></td><td>um campo simples</td><td><code>STRING</code> (ou <code>NULL</code>)</td></tr>
+    <tr><td><code>JSON_QUERY_ARRAY</code></td><td>abrir uma lista</td><td><code>ARRAY</code> de JSON</td></tr>
+    <tr><td><code>UNNEST</code></td><td>virar a lista em linhas</td><td>uma linha por item</td></tr>
+    <tr><td><code>SAFE_CAST</code></td><td>converter tipo sem quebrar</td><td>o valor ou <code>NULL</code></td></tr>
+  </table>
+
+  <div class="nota">
+    <b><code>SAFE_CAST</code>, sempre.</b> <code>CAST</code> derruba a query inteira se achar um valor torto.
+    <code>SAFE_CAST</code> devolve <code>NULL</code> e segue. Em dado bruto, use o seguro.
+  </div>
+
+  <h3>Passo 3 — construir a Silver</h3>
+  <p>O script completo está em <code>silver_01_json.sql</code>. Ele monta 25 colunas de uma vez.
+  Aqui está o formato, para você entender o desenho:</p>
+
+  <div class="bloco">
+    <header><span>silver_01_json.sql (trecho)</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">CREATE OR REPLACE TABLE</span> `SEU_PROJETO.SEU_DATASET.imoveis_silver` <span class="k">AS</span>
+<span class="k">SELECT</span>
+  id_anuncio,
+  <span class="f">SAFE_CAST</span>(
+    (<span class="k">SELECT</span> <span class="f">JSON_VALUE</span>(p, <span class="s">'$.price'</span>)
+     <span class="k">FROM</span> <span class="f">UNNEST</span>(<span class="f">JSON_QUERY_ARRAY</span>(listing, <span class="s">'$.pricingInfos'</span>)) <span class="k">AS</span> p
+     <span class="k">WHERE</span> <span class="f">JSON_VALUE</span>(p, <span class="s">'$.businessType'</span>) = <span class="s">'SALE'</span>
+     <span class="k">LIMIT</span> 1) <span class="k">AS</span> <span class="k">FLOAT64</span>)                        <span class="k">AS</span> preco,
+  <span class="f">SAFE_CAST</span>(<span class="f">JSON_VALUE</span>(listing,<span class="s">'$.usableAreas[0]'</span>) <span class="k">AS</span> <span class="k">FLOAT64</span>) <span class="k">AS</span> area_util,
+  <span class="f">SAFE_CAST</span>(<span class="f">JSON_VALUE</span>(listing,<span class="s">'$.bedrooms[0]'</span>)   <span class="k">AS</span> <span class="k">INT64</span>)   <span class="k">AS</span> quartos,
+  <span class="f">JSON_VALUE</span>(listing, <span class="s">'$.address.neighborhood'</span>)              <span class="k">AS</span> bairro,
+  <span class="f">JSON_VALUE</span>(listing, <span class="s">'$.unitTypes[0]'</span>)                       <span class="k">AS</span> tipo_imovel,
+  <span class="f">ARRAY_LENGTH</span>(<span class="f">JSON_QUERY_ARRAY</span>(listing,<span class="s">'$.amenities'</span>))     <span class="k">AS</span> qtd_comodidades
+  <span class="c">-- ... e mais 19 colunas</span>
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_bronze`;</pre>
+  </div>
+
+  <div class="chave">
+    Aquela parede de 14 mil caracteres virou uma tabela de 25 colunas.
+    Foi um comando. <b>Só que ela ainda está mentindo pra gente.</b>
+  </div>
+
+  <label class="check" data-id="c1">
+    <input type="checkbox">
+    <span><b>Checkpoint 1.</b> Minha <code>imoveis_silver</code> foi criada e um <code>SELECT * LIMIT 10</code>
+    devolve resultado. Se travou aqui, resolva agora — o resto da aula depende disso.</span>
+  </label>
+
+  <details>
+    <summary>Desafios</summary>
+    <div class="corpo">
+      <ol>
+        <li>Traga também <code>monthlyCondoFee</code> e <code>yearlyIptu</code> de dentro de <code>pricingInfos</code>.</li>
+        <li>Quantos anúncios têm <b>mais de um</b> <code>pricingInfos</code>? (dica: <code>ARRAY_LENGTH</code>)</li>
+        <li>Extraia latitude e longitude. Quantos anúncios têm coordenada exata?</li>
+      </ol>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ -->
+<section id="s3">
+  <h2><span class="num">3</span>O dado está mentindo<span class="selo mao">mão na massa</span></h2>
+  <p class="tese">Nenhum modelo vai te avisar que o número é impossível. Quem sabe disso é você.</p>
+
+  <p>A tabela está pronta. Quem quer treinar o modelo agora?<br>
+  Ótimo. Antes disso, três minutos olhando o dado.</p>
+
+  <h3>Defeito 1 — a média não bate com a mediana</h3>
+  <div class="bloco">
+    <header><span>estatística descritiva</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span>
+  <span class="f">COUNT</span>(*)                                        <span class="k">AS</span> anuncios,
+  <span class="f">ROUND</span>(<span class="f">AVG</span>(preco))                              <span class="k">AS</span> media,
+  <span class="f">ROUND</span>(<span class="f">APPROX_QUANTILES</span>(preco, 2)[<span class="k">OFFSET</span>(1)])   <span class="k">AS</span> mediana,
+  <span class="f">ROUND</span>(<span class="f">STDDEV</span>(preco))                           <span class="k">AS</span> desvio_padrao,
+  <span class="f">ROUND</span>(<span class="f">MAX</span>(preco))                              <span class="k">AS</span> maximo
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_silver`
+<span class="k">WHERE</span> preco <span class="k">IS NOT NULL</span>;</pre>
+  </div>
+
+  <p>A média dá mais que o <b>dobro</b> da mediana. Quando isso acontece, alguma coisa
+  do lado direito está puxando tudo. Vá ver quem é:</p>
+
+  <div class="bloco">
+    <header><span>quem está puxando</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span> id_anuncio, tipo_imovel, bairro, area_util, <span class="f">ROUND</span>(preco) <span class="k">AS</span> preco
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_silver`
+<span class="k">WHERE</span> preco &gt; 50000000
+<span class="k">ORDER BY</span> preco <span class="k">DESC</span>
+<span class="k">LIMIT</span> 20;</pre>
+  </div>
+
+  <details class="spoiler">
+    <summary>O que você vai encontrar</summary>
+    <div class="corpo">
+      <ul>
+        <li>Um lote de 681 m² anunciado por <b>R$ 1,4 bilhão</b></li>
+        <li>Uma fazenda por R$ 675 milhões</li>
+        <li>Um <b>apartamento de 74 m²</b>, no Vila Rosa, por <b>R$ 499 milhões</b></li>
+      </ul>
+      <p>Alguns são erro de escala — o anunciante digitou o valor em centavos, ou repetiu zeros.
+      Outros são imóvel caro de verdade: este dataset é genuinamente de alto padrão
+      (mediana em torno de R$ 9 milhões). Distinguir os dois casos é o trabalho.</p>
+    </div>
+  </details>
+
+  <p>Agora <b>meça</b> o estrago. Não estime, meça:</p>
+
+  <div class="bloco">
+    <header><span>o número que importa</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span>
+  <span class="f">COUNTIF</span>(preco &gt; 50000000)                                  <span class="k">AS</span> suspeitos,
+  <span class="f">COUNT</span>(*)                                                  <span class="k">AS</span> total,
+  <span class="f">ROUND</span>(100 * <span class="f">COUNTIF</span>(preco &gt; 50000000) / <span class="f">COUNT</span>(*), 1)      <span class="k">AS</span> pct,
+  <span class="f">ROUND</span>(<span class="f">STDDEV</span>(preco))                                     <span class="k">AS</span> desvio_com_eles,
+  <span class="f">ROUND</span>(<span class="f">STDDEV</span>(<span class="f">IF</span>(preco &lt;= 50000000, preco, <span class="k">NULL</span>)))       <span class="k">AS</span> desvio_sem_eles
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_silver`
+<span class="k">WHERE</span> preco <span class="k">IS NOT NULL</span>;</pre>
+  </div>
+
+  <div class="chave"><b>2,9% das linhas controlam 90% da variação.</b></div>
+
+  <h3>Defeito 2 — a unidade trocada</h3>
+  <div class="bloco">
+    <header><span>áreas impossíveis</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span> id_anuncio, tipo_imovel, bairro, area_util, <span class="f">ROUND</span>(preco) <span class="k">AS</span> preco
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_silver`
+<span class="k">WHERE</span> area_util &gt; 10000
+<span class="k">ORDER BY</span> area_util <span class="k">DESC</span>
+<span class="k">LIMIT</span> 15;</pre>
+  </div>
+
+  <details class="spoiler">
+    <summary>O campeão</summary>
+    <div class="corpo">
+      <p>Uma fazenda com <code>usableAreas</code> = <b>390.000.000 m²</b>. Isso é 390 mil km².
+      <b>É maior que a Alemanha.</b></p>
+      <p>Quase certamente alguém digitou a área em m² num campo que o sistema esperava
+      em hectares, ou colou o valor errado. O BigQuery aceitou sem piscar —
+      é um número válido.</p>
+    </div>
+  </details>
+
+  <div class="alerta">
+    <b>A lição.</b> Validade de tipo não é validade de significado.
+    <code>390000000</code> é um <code>FLOAT64</code> perfeitamente correto.
+    Só um humano que sabe o tamanho de uma fazenda percebe o problema.
+  </div>
+
+  <h3>Defeito 3 — informação repetida no texto</h3>
+  <div class="bloco">
+    <header><span>o preço escrito na descrição</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span>
+  <span class="f">COUNTIF</span>(<span class="f">REGEXP_CONTAINS</span>(descricao, <span class="s">r'R\$'</span>))                 <span class="k">AS</span> com_preco_no_texto,
+  <span class="f">COUNT</span>(*)                                                     <span class="k">AS</span> total,
+  <span class="f">ROUND</span>(100 * <span class="f">COUNTIF</span>(<span class="f">REGEXP_CONTAINS</span>(descricao, <span class="s">r'R\$'</span>)) / <span class="f">COUNT</span>(*), 1) <span class="k">AS</span> pct
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_silver`
+<span class="k">WHERE</span> descricao <span class="k">IS NOT NULL</span>;</pre>
+  </div>
+  <p>Cerca de <b>23%</b> dos anúncios trazem o valor escrito dentro da descrição.
+  Guarde esse número. Ele volta na etapa 6, e não vai ser do jeito que você espera.</p>
+
+  <h3>A camada Gold</h3>
+  <p>Cada linha do <code>WHERE</code> abaixo é uma <b>decisão que você toma e justifica</b>,
+  não uma regra que veio de fora:</p>
+
+  <div class="bloco">
+    <header><span>silver_02_etl.sql — a Gold</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">CREATE OR REPLACE TABLE</span> `SEU_PROJETO.SEU_DATASET.imoveis_gold` <span class="k">AS</span>
+<span class="k">SELECT</span>
+  id_anuncio, preco, area_util, quartos, banheiros, suites, vagas,
+  condominio, iptu_anual, bairro, tipo_imovel, uso, imobiliaria,
+  qtd_comodidades, descricao,
+  <span class="f">ROUND</span>(preco / area_util, 2) <span class="k">AS</span> preco_por_m2
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_silver`
+<span class="k">WHERE</span> preco <span class="k">IS NOT NULL</span>
+  <span class="k">AND</span> preco     <span class="k">BETWEEN</span> 50000 <span class="k">AND</span> 50000000  <span class="c">-- corta erro de escala (2,9%)</span>
+  <span class="k">AND</span> area_util <span class="k">BETWEEN</span> 20    <span class="k">AND</span> 10000     <span class="c">-- corta unidade trocada</span>
+  <span class="k">AND</span> cidade = <span class="s">'Goiania'</span>;                    <span class="c">-- 999 de 1000 sao daqui</span></pre>
+  </div>
+
+  <div class="chave">
+    Isso que você acabou de fazer tem nome: <b>ETL</b>.<br>
+    Não é a parte chata antes do ML. É a parte que decide se o ML vai servir pra alguma coisa.
+  </div>
+
+  <details>
+    <summary>Desafios</summary>
+    <div class="corpo">
+      <ol>
+        <li>Em vez de cortar em R$ 50 mi, use o método do IQR
+          (<code>APPROX_QUANTILES(preco, 4)</code>, corte acima de Q3 + 1,5×IQR).
+          Quantos anúncios sobram? Qual critério você defenderia numa reunião?</li>
+        <li>Os anúncios com erro de escala se concentram em alguma imobiliária?
+          Se sim, o problema é do dado ou de <i>quem cadastra</i>?</li>
+        <li>Quantas linhas a Gold perdeu em relação à Silver, e em porcentagem?
+          <b>Sempre meça isso</b> — perder 60% dos dados numa limpeza é motivo para revisar as regras.</li>
+      </ol>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ -->
+<section id="s4">
+  <h2><span class="num">4</span>O cardápio do BigQuery ML</h2>
+  <p class="tese">Primeiro a pergunta. Depois o <code>model_type</code>. Nunca o contrário.</p>
+
+  <table>
+    <tr><th>Sua pergunta</th><th>Nome disso</th><th><code>model_type</code></th></tr>
+    <tr><td>Quanto vai ser? (um número)</td><td>regressão</td><td><code>LINEAR_REG</code>, <code>BOOSTED_TREE_REGRESSOR</code></td></tr>
+    <tr><td>É A ou B?</td><td>classificação</td><td><code>LOGISTIC_REG</code>, <code>BOOSTED_TREE_CLASSIFIER</code></td></tr>
+    <tr><td>Quanto no mês que vem?</td><td>série temporal</td><td><code>ARIMA_PLUS</code></td></tr>
+    <tr><td>Quais se parecem entre si?</td><td>agrupamento</td><td><code>KMEANS</code></td></tr>
+    <tr><td>O que recomendar?</td><td>recomendação</td><td><code>MATRIX_FACTORIZATION</code></td></tr>
+    <tr><td>Buscar por significado</td><td>embeddings</td><td><code>ML.GENERATE_EMBEDDING</code> + <code>VECTOR_SEARCH</code></td></tr>
+    <tr><td>Chamar o Gemini de dentro do SQL</td><td>LLM</td><td><code>ML.GENERATE_TEXT</code> (via Vertex AI)</td></tr>
+    <tr><td>Já tenho um modelo pronto</td><td>importar</td><td><code>TENSORFLOW</code>, <code>ONNX</code>, <code>REMOTE</code></td></tr>
+  </table>
+
+  <div class="alerta">
+    <b>Por que <code>ARIMA_PLUS</code> não é demonstrado hoje.</b>
+    O campo de data deste dataset é a data de <i>publicação do anúncio</i>, não a data de venda.
+    Não existe série temporal aqui. <b>O dado decide o modelo</b> — não o contrário.
+    Querer usar ARIMA num dado sem série é o erro que mais aparece em trabalho de disciplina.
+  </div>
+
+  <p>O que <b>não</b> cabe no BigQuery ML: visão computacional, arquitetura customizada, treino distribuído
+  em GPU. Isso é Vertex AI, e é a aula de 02/10.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="s5">
+  <h2><span class="num">5</span>Regressão: quanto vale este imóvel?<span class="selo mao">mão na massa</span></h2>
+  <p class="tese">Você já sabe <code>CREATE TABLE</code>. É o mesmo verbo.</p>
+
+  <div class="bloco">
+    <header><span>ml_03_regressao.sql — treinar</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">CREATE OR REPLACE MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_preco`
+<span class="k">OPTIONS</span> (
+  model_type            = <span class="s">'LINEAR_REG'</span>,
+  input_label_cols      = [<span class="s">'preco'</span>],   <span class="c">-- &lt;&lt;&lt; o que queremos prever</span>
+  data_split_method     = <span class="s">'AUTO_SPLIT'</span>,
+  enable_global_explain = <span class="k">TRUE</span>
+) <span class="k">AS</span>
+<span class="k">SELECT</span>
+  preco,            <span class="c">-- label</span>
+  area_util, quartos, banheiros, suites, vagas, qtd_comodidades,
+  bairro, tipo_imovel, uso
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_gold`;</pre>
+  </div>
+
+  <p>Três coisas para reparar enquanto o treino roda:</p>
+  <ol>
+    <li><b>Não existe lista de features.</b> <code>input_label_cols</code> diz qual coluna é a resposta;
+      todo o resto do <code>SELECT</code> vira entrada.</li>
+    <li><b><code>bairro</code> e <code>tipo_imovel</code> são texto e entraram direto.</b>
+      Em Python isso seria <code>OneHotEncoder</code> + <code>ColumnTransformer</code>. Aqui você só colocou a coluna.</li>
+    <li><b><code>AUTO_SPLIT</code>.</b> O BigQuery separou treino e validação sozinho.
+      Você não escreveu, e não tem como esquecer de fazer.</li>
+  </ol>
+
+  <div class="bloco">
+    <header><span>avaliar</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span> * <span class="k">FROM</span> <span class="f">ML.EVALUATE</span>(<span class="k">MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_preco`);</pre>
+  </div>
+
+  <table>
+    <tr><th>Métrica</th><th>O que é</th></tr>
+    <tr><td><code>mean_absolute_error</code></td><td>Em <b>reais</b>: quanto o modelo erra, em média</td></tr>
+    <tr><td><code>r2_score</code></td><td>De 0 a 1: quanto da variação do preço ele conseguiu explicar. 0 = chutar a média</td></tr>
+  </table>
+
+  <div class="nota">
+    <b>R² não é nota de prova.</b> É quanto do mundo o modelo enxergou.
+    Preço de imóvel é difícil: um R² entre 0,4 e 0,7 é um resultado honesto,
+    e dá uma discussão muito melhor do que 0,99. Se der 0,99, desconfie — e vá para a etapa 6.
+  </div>
+
+  <div class="bloco">
+    <header><span>prever — ordenado pelos PIORES erros, de propósito</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span>
+  bairro, tipo_imovel, area_util, quartos,
+  <span class="f">ROUND</span>(preco)                   <span class="k">AS</span> preco_real,
+  <span class="f">ROUND</span>(predicted_preco)         <span class="k">AS</span> preco_previsto,
+  <span class="f">ROUND</span>(predicted_preco - preco) <span class="k">AS</span> erro
+<span class="k">FROM</span> <span class="f">ML.PREDICT</span>(
+  <span class="k">MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_preco`,
+  (<span class="k">SELECT</span> * <span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_gold`)
+)
+<span class="k">ORDER BY</span> <span class="f">ABS</span>(predicted_preco - preco) <span class="k">DESC</span>
+<span class="k">LIMIT</span> 20;</pre>
+  </div>
+
+  <div class="pergunta">
+    <p class="q">Olhe os 20 piores erros. O que eles têm em comum?</p>
+    <p>Quase sempre há um padrão: são os mais caros, ou de um bairro com poucos anúncios,
+    ou de um tipo raro. <b>Isso é análise de erro</b> — e é mais útil que o R².</p>
+  </div>
+
+  <div class="bloco">
+    <header><span>perguntar ao modelo o que ele achou importante</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span> * <span class="k">FROM</span> <span class="f">ML.GLOBAL_EXPLAIN</span>(<span class="k">MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_preco`)
+<span class="k">ORDER BY</span> attribution <span class="k">DESC</span>;</pre>
+  </div>
+
+  <div class="chave">
+    O modelo não é uma caixa preta por natureza.<br>
+    <b>Ele é uma caixa preta quando você não pergunta.</b>
+  </div>
+
+  <label class="check" data-id="c2">
+    <input type="checkbox">
+    <span><b>Checkpoint 2.</b> Tenho um modelo aparecendo no painel do dataset e já rodei o <code>ML.EVALUATE</code> dele.</span>
+  </label>
+
+  <details>
+    <summary>Desafios</summary>
+    <div class="corpo">
+      <ol>
+        <li>Troque <code>LINEAR_REG</code> por <code>BOOSTED_TREE_REGRESSOR</code> e compare.
+          Ganhou quem teve o melhor R², ou quem teve o menor erro em reais?</li>
+        <li>Adicione <code>preco_por_m2</code> como feature. O R² vai para perto de 1.
+          <b>Por que isso é um problema e não uma vitória?</b> (dica: <code>preco_por_m2 = preco / area_util</code>)</li>
+        <li>Treine só com imóveis <code>RESIDENTIAL</code>. Melhorou? O que isso diz sobre
+          misturar residencial e comercial no mesmo modelo?</li>
+      </ol>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ -->
+<section id="s6">
+  <h2><span class="num">6</span>Classificação: residencial ou comercial?<span class="selo mao">mão na massa</span></h2>
+  <p class="tese">Muda uma palavra dentro do <code>OPTIONS</code>. Mais nada.</p>
+
+  <h3>Antes de treinar: conte as classes</h3>
+  <div class="bloco">
+    <header><span>a linha de corte</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span>
+  uso,
+  <span class="f">COUNT</span>(*) <span class="k">AS</span> anuncios,
+  <span class="f">ROUND</span>(100 * <span class="f">COUNT</span>(*) / <span class="f">SUM</span>(<span class="f">COUNT</span>(*)) <span class="k">OVER</span> (), 1) <span class="k">AS</span> pct
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_gold`
+<span class="k">WHERE</span> uso <span class="k">IS NOT NULL</span>
+<span class="k">GROUP BY</span> uso;</pre>
+  </div>
+
+  <div class="pergunta">
+    <p class="q">Se eu criar um modelo que responde RESIDENTIAL para tudo, sem olhar nada,
+    qual vai ser a acurácia dele?</p>
+    <p>Anote o número antes de continuar. Ele é a nota mínima. Um modelo que não bate isso
+    não aprendeu nada — mesmo com 80% de acerto.</p>
+  </div>
+
+  <div class="bloco">
+    <header><span>ml_04_classificacao.sql — treinar</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">CREATE OR REPLACE MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_uso`
+<span class="k">OPTIONS</span> (
+  model_type         = <span class="s">'LOGISTIC_REG'</span>,   <span class="c">-- &lt;&lt;&lt; a unica mudanca estrutural</span>
+  input_label_cols   = [<span class="s">'uso'</span>],
+  data_split_method  = <span class="s">'AUTO_SPLIT'</span>,
+  auto_class_weights = <span class="k">TRUE</span>,             <span class="c">-- compensa o desbalanceamento</span>
+  enable_global_explain = <span class="k">TRUE</span>
+) <span class="k">AS</span>
+<span class="k">SELECT</span>
+  uso,
+  area_util, quartos, banheiros, suites, vagas, qtd_comodidades,
+  preco, preco_por_m2, bairro, tipo_imovel
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_gold`
+<span class="k">WHERE</span> uso <span class="k">IS NOT NULL</span>;</pre>
+  </div>
+
+  <div class="nota">
+    <b><code>auto_class_weights</code>.</b> Sem isso, o modelo descobre que chutar a classe
+    majoritária já acerta a maioria e nunca se esforça para achar a minoritária.
+    Classe desbalanceada não é detalhe estatístico — é o modelo percebendo que dá pra colar na prova.
+  </div>
+
+  <div class="bloco">
+    <header><span>avaliar e ler a matriz de confusão</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span> * <span class="k">FROM</span> <span class="f">ML.EVALUATE</span>(<span class="k">MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_uso`);
+
+<span class="k">SELECT</span> * <span class="k">FROM</span> <span class="f">ML.CONFUSION_MATRIX</span>(<span class="k">MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_uso`);</pre>
+  </div>
+
+  <table>
+    <tr><th>Métrica</th><th>Responde</th></tr>
+    <tr><td><code>accuracy</code></td><td>% de acertos — <b>compare com a linha de corte que você anotou</b></td></tr>
+    <tr><td><code>recall</code></td><td>Dos comerciais que existiam, quantos ele achou?</td></tr>
+    <tr><td><code>precision</code></td><td>Dos que ele <i>chamou</i> de comercial, quantos eram mesmo?</td></tr>
+  </table>
+
+  <div class="chave">
+    Precision e recall respondem perguntas diferentes.<br>
+    <b>Escolher qual importa não é decisão do modelo. É sua.</b>
+  </div>
+  <p>Filtro de spam: precision importa mais (não jogue e-mail bom fora).
+  Exame de câncer: recall importa mais (não deixe doente passar).</p>
+
+  <div class="bloco">
+    <header><span>os erros cometidos com MAIS confiança</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span>
+  bairro, tipo_imovel, area_util,
+  uso           <span class="k">AS</span> uso_real,
+  predicted_uso <span class="k">AS</span> uso_previsto,
+  <span class="f">ROUND</span>((<span class="k">SELECT</span> <span class="f">MAX</span>(p.prob) <span class="k">FROM</span> <span class="f">UNNEST</span>(predicted_uso_probs) <span class="k">AS</span> p), 3) <span class="k">AS</span> confianca
+<span class="k">FROM</span> <span class="f">ML.PREDICT</span>(
+  <span class="k">MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_uso`,
+  (<span class="k">SELECT</span> * <span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_gold` <span class="k">WHERE</span> uso <span class="k">IS NOT NULL</span>)
+)
+<span class="k">WHERE</span> uso &lt;&gt; predicted_uso
+<span class="k">ORDER BY</span> confianca <span class="k">DESC</span>
+<span class="k">LIMIT</span> 20;</pre>
+  </div>
+
+  <p>Repare no <code>predicted_uso_probs</code>: classificação não devolve só o rótulo, devolve a
+  probabilidade de cada classe — num array de struct. É o mesmo <code>UNNEST</code> do JSON, no começo da aula.</p>
+
+  <div class="chave">
+    Um modelo errando com 51% de certeza está em dúvida.<br>
+    <b>Errando com 98% de certeza, ele aprendeu a coisa errada.</b> São problemas diferentes.
+  </div>
+
+  <details>
+    <summary>Desafios</summary>
+    <div class="corpo">
+      <ol>
+        <li>Treine de novo <b>sem</b> <code>tipo_imovel</code>. A acurácia cai quanto?
+          Esse segundo modelo é pior — ou é mais honesto?</li>
+        <li>Rode com <code>auto_class_weights = FALSE</code> e compare a matriz de confusão.
+          Onde exatamente ele passou a errar?</li>
+        <li>Troque por <code>BOOSTED_TREE_CLASSIFIER</code>. Valeu o custo de treino a mais?</li>
+      </ol>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ -->
+<section id="s7">
+  <h2><span class="num">7</span>O modelo bom demais<span class="selo ver">acompanhe na tela</span></h2>
+  <p class="tese">Métrica quase perfeita em problema do mundo real é quase sempre vazamento — não genialidade.</p>
+
+  <p>Os modelos erraram bastante. Vamos melhorar. Temos uma coluna que nem usamos ainda:
+  a <b>descrição</b> do anúncio. Texto é informação.</p>
+
+  <h3>Passo 1 — extrair informação do texto</h3>
+  <p>É o que qualquer pipeline de NLP faria: puxar entidades do texto livre.
+  Números com R$ na frente são a entidade mais óbvia que existe.</p>
+
+  <div class="bloco">
+    <header><span>ml_05_armadilha.sql — a feature nova</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">CREATE OR REPLACE TABLE</span> `SEU_PROJETO.SEU_DATASET.imoveis_gold_texto` <span class="k">AS</span>
+<span class="k">SELECT</span>
+  *,
+  <span class="f">SAFE_CAST</span>(
+    <span class="f">REPLACE</span>(<span class="f">REPLACE</span>(
+      <span class="f">REGEXP_EXTRACT</span>(descricao, <span class="s">r'R\$\s*([0-9][0-9\.]*(?:,[0-9]{2})?)'</span>),
+    <span class="s">'.'</span>, <span class="s">''</span>), <span class="s">','</span>, <span class="s">'.'</span>) <span class="k">AS</span> <span class="k">FLOAT64</span>
+  ) <span class="k">AS</span> valor_citado_no_texto
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_gold`;</pre>
+  </div>
+
+  <h3>Passo 2 — treinar de novo, com ela</h3>
+  <div class="bloco">
+    <header><span>o modelo v2</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">CREATE OR REPLACE MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_preco_v2`
+<span class="k">OPTIONS</span> (
+  model_type            = <span class="s">'LINEAR_REG'</span>,
+  input_label_cols      = [<span class="s">'preco'</span>],
+  data_split_method     = <span class="s">'AUTO_SPLIT'</span>,
+  enable_global_explain = <span class="k">TRUE</span>
+) <span class="k">AS</span>
+<span class="k">SELECT</span>
+  preco,
+  area_util, quartos, banheiros, suites, vagas, qtd_comodidades,
+  bairro, tipo_imovel, uso,
+  valor_citado_no_texto   <span class="c">-- &lt;&lt;&lt; a unica coisa que mudou</span>
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_gold_texto`;</pre>
+  </div>
+
+  <div class="bloco">
+    <header><span>os dois lado a lado</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span> <span class="s">'v1 (so caracteristicas)'</span> <span class="k">AS</span> modelo, r2_score, mean_absolute_error
+<span class="k">FROM</span> <span class="f">ML.EVALUATE</span>(<span class="k">MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_preco`)
+<span class="k">UNION ALL</span>
+<span class="k">SELECT</span> <span class="s">'v2 (+ valor do texto)'</span>, r2_score, mean_absolute_error
+<span class="k">FROM</span> <span class="f">ML.EVALUATE</span>(<span class="k">MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_preco_v2`);</pre>
+  </div>
+
+  <p>O v2 ganha. E ganha muito.</p>
+
+  <div class="pergunta">
+    <p class="q">Publicamos esse modelo?</p>
+    <p>Antes de responder: <b>de onde saiu o número que a gente extraiu?</b></p>
+  </div>
+
+  <details class="spoiler">
+    <summary>A resposta</summary>
+    <div class="corpo">
+      <div class="bloco">
+        <header><span>as duas colunas lado a lado</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span>
+  id_anuncio,
+  <span class="f">ROUND</span>(preco)                 <span class="k">AS</span> preco_da_coluna,
+  <span class="f">ROUND</span>(valor_citado_no_texto) <span class="k">AS</span> valor_extraido_do_texto,
+  <span class="f">SUBSTR</span>(descricao, 1, 120)    <span class="k">AS</span> trecho
+<span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_gold_texto`
+<span class="k">WHERE</span> valor_citado_no_texto <span class="k">IS NOT NULL</span>
+<span class="k">ORDER BY</span> <span class="f">ABS</span>(valor_citado_no_texto - preco) <span class="k">ASC</span>
+<span class="k">LIMIT</span> 15;</pre>
+      </div>
+      <p>As duas colunas de número são <b>iguais</b>.</p>
+      <div class="chave">
+        Você não criou uma feature. Você copiou a resposta de dentro do texto
+        e colou na entrada do modelo.<br>
+        <b>O modelo não ficou melhor. Ele ficou com a prova na mão.</b>
+      </div>
+      <p>Isso tem nome: <b>vazamento de alvo</b> (<i>data leakage</i>).</p>
+    </div>
+  </details>
+
+  <h3>A prova de que o modelo não serve</h3>
+  <p>Uma métrica global esconde o crime. Basta separar em dois grupos:</p>
+
+  <div class="bloco">
+    <header><span>decompondo o erro</span><button onclick="copiar(this)">copiar</button></header>
+<pre><span class="k">SELECT</span>
+  <span class="f">IF</span>(valor_citado_no_texto <span class="k">IS NOT NULL</span>,
+     <span class="s">'anuncio com preco escrito no texto'</span>,
+     <span class="s">'anuncio SEM preco no texto'</span>)            <span class="k">AS</span> grupo,
+  <span class="f">COUNT</span>(*)                                    <span class="k">AS</span> anuncios,
+  <span class="f">ROUND</span>(<span class="f">AVG</span>(<span class="f">ABS</span>(predicted_preco - preco)))   <span class="k">AS</span> erro_medio_em_reais
+<span class="k">FROM</span> <span class="f">ML.PREDICT</span>(
+  <span class="k">MODEL</span> `SEU_PROJETO.SEU_DATASET.modelo_preco_v2`,
+  (<span class="k">SELECT</span> * <span class="k">FROM</span> `SEU_PROJETO.SEU_DATASET.imoveis_gold_texto`)
+)
+<span class="k">GROUP BY</span> grupo;</pre>
+  </div>
+
+  <details class="spoiler">
+    <summary>O que aparece</summary>
+    <div class="corpo">
+      <ul>
+        <li>Nos ~23% que têm o preço no texto: erro <b>próximo de zero</b></li>
+        <li>Nos ~77% restantes: erro <b>enorme</b></li>
+      </ul>
+      <div class="chave">
+        Esse modelo não avalia imóvel. <b>Ele lê anúncio.</b><br>
+        Em produção, todo imóvel novo chega <i>sem</i> preço — se tivesse preço,
+        você não precisaria do modelo.
+      </div>
+      <p>E dá para descobrir isso com uma query só:
+      <code>ML.GLOBAL_EXPLAIN</code> vai mostrar <code>valor_citado_no_texto</code> dominando
+      todo o resto. A explicabilidade não é enfeite de slide — é teste de sanidade.</p>
+    </div>
+  </details>
+
+  <h3>O checklist — leve este da aula</h3>
+  <p>Antes de acreditar em qualquer métrica boa, três perguntas:</p>
+  <ol>
+    <li><b>Essa coluna vai existir no momento em que eu for prever?</b><br>
+      O preço no texto não existe num imóvel que ainda não tem preço.</li>
+    <li><b>Essa coluna foi preenchida <i>depois</i> de acontecer o que eu quero prever?</b><br>
+      Data de pagamento para prever inadimplência. Data de alta para prever internação.
+      Status do pedido para prever cancelamento.</li>
+    <li><b>O resultado ficou bom demais?</b><br>
+      Métrica quase perfeita é quase sempre vazamento.</li>
+  </ol>
+
+  <div class="chave">
+    Treinar modelo no BigQuery é uma linha de SQL.<br>
+    O trabalho de verdade é tudo que veio <b>antes</b> do <code>CREATE MODEL</code>:
+    abrir o JSON, achar a fazenda do tamanho da Alemanha, e desconfiar do modelo que acertou demais.<br>
+    <b>Isso nenhuma ferramenta faz por você.</b>
+  </div>
+
+  <details>
+    <summary>Desafios</summary>
+    <div class="corpo">
+      <ol>
+        <li>Use o texto do jeito <b>certo</b>: remova os valores em R$ com <code>REGEXP_REPLACE</code>
+          e treine com <code>ML.NGRAMS(SPLIT(LOWER(descricao_limpa), ' '), [1, 2])</code>.
+          Palavras como "alto padrão", "piscina" e "vista" ajudam de verdade?</li>
+        <li>O desafio 2 da etapa 5 pedia <code>preco_por_m2</code> como feature.
+          Era o mesmo crime deste bloco. Explique por quê, em duas frases.</li>
+        <li>Procure um vazamento no dataset do <b>seu</b> trabalho.
+          Se você não achou nenhum, provavelmente ainda não procurou direito.</li>
+      </ol>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================ -->
+<section id="s8">
+  <h2><span class="num">8</span>Checklist do Trabalho 1</h2>
+  <p class="tese">Modelo com métrica perfeita será tratado como vazamento até prova em contrário.</p>
+
+  <p>A entrega de 11/09 pede: ingestão no GCS, arquitetura Medallion, e a partir da Gold
+  um modelo treinado <b>puramente com BigQuery ML</b>. Antes de entregar, passe por aqui:</p>
+
+  <label class="check" data-id="t1"><input type="checkbox">
+    <span><b>1.</b> Cada coluna que virou feature <b>existiria</b> no momento da predição?</span></label>
+  <label class="check" data-id="t2"><input type="checkbox">
+    <span><b>2.</b> Nenhuma feature foi preenchida <b>depois</b> do que eu quero prever?</span></label>
+  <label class="check" data-id="t3"><input type="checkbox">
+    <span><b>3.</b> Comparei meu modelo com "chutar a média / a classe majoritária"?</span></label>
+  <label class="check" data-id="t4"><input type="checkbox">
+    <span><b>4.</b> Rodei <code>ML.EVALUATE</code> e sei explicar o que cada número significa?</span></label>
+  <label class="check" data-id="t5"><input type="checkbox">
+    <span><b>5.</b> Meu <code>ML.PREDICT</code> funciona com uma linha <b>nova</b>, que não estava no treino?</span></label>
+
+  <h3>Scripts para baixar</h3>
+  <table>
+    <tr><th>Arquivo</th><th>Etapa</th></tr>
+    <tr><td><code>bronze_00_setup.sql</code></td><td>1 — External Table sobre o CSV</td></tr>
+    <tr><td><code>silver_01_json.sql</code></td><td>2 — JSON aninhado vira tabela</td></tr>
+    <tr><td><code>silver_02_etl.sql</code></td><td>3 — os três defeitos + camada Gold</td></tr>
+    <tr><td><code>ml_03_regressao.sql</code></td><td>5 — <code>LINEAR_REG</code></td></tr>
+    <tr><td><code>ml_04_classificacao.sql</code></td><td>6 — <code>LOGISTIC_REG</code></td></tr>
+    <tr><td><code>ml_05_armadilha.sql</code></td><td>7 — vazamento de alvo</td></tr>
+  </table>
+
+  <h3>Para onde isso vai</h3>
+  <ul>
+    <li><b>18/09 e 25/09</b> — o dado chegando em tempo real: Pub/Sub e Dataflow</li>
+    <li><b>02/10 e 09/10</b> — quando o modelo precisa sair do warehouse: Vertex AI e Cloud Run</li>
+    <li><b>13/11 e 27/11</b> — juntar tudo num pipeline orquestrado com n8n</li>
+    <li><b>04/12</b> — o Trabalho Final é exatamente isso, de ponta a ponta</li>
+  </ul>
+
+  <div class="nota">
+    Guarde este arquivo. Ele funciona offline, os botões <b>copiar</b> continuam funcionando,
+    e o seu progresso nos checkboxes fica salvo neste navegador.
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* copiar codigo ------------------------------------------------ */
+  window.copiar = function(btn){
+    var pre = btn.closest(".bloco").querySelector("pre");
+    var txt = pre.innerText;
+    var done = function(){
+      var antes = btn.textContent;
+      btn.textContent = "copiado";
+      btn.classList.add("ok");
+      setTimeout(function(){ btn.textContent = antes; btn.classList.remove("ok"); }, 1400);
+    };
+    if(navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(txt).then(done, fallback);
+    } else { fallback(); }
+    function fallback(){
+      var ta = document.createElement("textarea");
+      ta.value = txt;
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); done(); } catch(e){}
+      document.body.removeChild(ta);
+    }
+  };
+
+  /* memoria local (tolerante a file:// bloqueado) ----------------- */
+  var mem = {
+    ler: function(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    gravar: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+  };
+
+  /* checkboxes + progresso --------------------------------------- */
+  var checks = Array.prototype.slice.call(document.querySelectorAll(".check"));
+  var barra  = document.getElementById("barraProg");
+  var rotulo = document.getElementById("rotulo");
+
+  function pintar(){
+    var feitos = 0;
+    checks.forEach(function(c){
+      var on = c.querySelector("input").checked;
+      c.classList.toggle("feito", on);
+      if(on) feitos++;
+    });
+    barra.style.width = (100 * feitos / checks.length) + "%";
+    rotulo.textContent = feitos + " de " + checks.length + " etapas";
+  }
+
+  checks.forEach(function(c){
+    var input = c.querySelector("input");
+    var chave = "pdm0409:" + c.dataset.id;
+    if(mem.ler(chave) === "1") input.checked = true;
+    input.addEventListener("change", function(){
+      mem.gravar(chave, input.checked ? "1" : "0");
+      pintar();
+    });
+  });
+  pintar();
+
+  /* modo projecao ------------------------------------------------- */
+  var btn = document.getElementById("btnProj");
+  function projecao(on){
+    document.body.classList.toggle("projecao", on);
+    btn.classList.toggle("on", on);
+    btn.textContent = on ? "Sair da projeção" : "Modo projeção";
+    mem.gravar("pdm0409:proj", on ? "1" : "0");
+  }
+  btn.addEventListener("click", function(){
+    projecao(!document.body.classList.contains("projecao"));
+  });
+  if(mem.ler("pdm0409:proj") === "1") projecao(true);
+
+  /* atalhos: P projeta, ESC sai ----------------------------------- */
+  document.addEventListener("keydown", function(e){
+    if(e.target.matches("input,textarea")) return;
+    if(e.key === "p" || e.key === "P"){
+      projecao(!document.body.classList.contains("projecao"));
+    }
+    if(e.key === "Escape" && document.body.classList.contains("projecao")){
+      projecao(false);
+    }
+  });
+})();
+</script>
+</body>
+</html>

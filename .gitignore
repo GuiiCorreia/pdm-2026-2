@@ -1,0 +1,75 @@
+# =============================================================================
+# Segredos — NUNCA commitar
+# =============================================================================
+# Regra da disciplina: todo segredo mora em .env, e .env nunca entra no git.
+# O que vai para o repositorio e o .env.example, com placeholders.
+.env
+.env.*
+!.env.example
+!.env.template
+
+*.local.env
+*.secret
+*.secrets
+
+# Chaves e credenciais
+credentials.json
+client_secret*.json
+service-account*.json
+*-key.json
+*.pem
+*.key
+*.p12
+.credentials/
+.secrets/
+
+# Credenciais do Google Cloud SDK
+.config/gcloud/
+application_default_credentials.json
+
+# Exportacoes de workflow do n8n com credencial embutida.
+# Exporte SEMPRE sem credenciais antes de commitar.
+*.credentials.json
+workflows/*-com-credenciais.json
+
+# =============================================================================
+# Dados pesados e gerados
+# =============================================================================
+# O dataset de 1.000 anuncios (aula-pdm.csv) E versionado de proposito,
+# para o aluno so precisar de git clone. O dump completo, nao.
+dados/dump-completo/
+dados/*.parquet
+dados/*.jsonl
+*.zip
+*.tar.gz
+
+# Saidas do perfilador e de exportacoes do BigQuery
+saidas/
+resultados/
+*.out.csv
+
+# =============================================================================
+# Python
+# =============================================================================
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# =============================================================================
+# Node
+# =============================================================================
+node_modules/
+npm-debug.log*
+
+# =============================================================================
+# Sistema operacional e editores
+# =============================================================================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
