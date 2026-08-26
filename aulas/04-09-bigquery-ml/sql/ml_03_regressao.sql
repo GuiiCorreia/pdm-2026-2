@@ -38,6 +38,54 @@ SELECT
   uso
 FROM `SEU_PROJETO.SEU_DATASET.imoveis_gold`;
 
+-- =====================================================================
+-- COMO LER ESTE COMANDO
+-- =====================================================================
+-- O comando tem TRES partes, sempre nesta ordem:
+--
+--   CREATE OR REPLACE MODEL `projeto.dataset.nome`     <- 1) o nome
+--   OPTIONS ( ... )                                    <- 2) as regras
+--   AS SELECT ...                                      <- 3) o dado
+--
+--   1) O MODELO E UM OBJETO DO DATASET.
+--      Ele mora no mesmo lugar que a tabela, tem nome de tres partes
+--      igual a tabela, e aparece no painel esquerdo do console junto
+--      com ela. Nao e arquivo, nao e .pkl, nao esta na sua maquina.
+--      "OR REPLACE": rodar de novo retreina por cima. Sem historico,
+--      sem versao — se voce quer comparar dois, use dois nomes.
+--
+--   2) OPTIONS e a lista de decisoes, uma por linha:
+--        model_type='LINEAR_REG'    qual algoritmo
+--        input_label_cols=['preco'] qual coluna e a RESPOSTA
+--                                   (e lista, entre colchetes, porque
+--                                    alguns tipos de modelo aceitam
+--                                    mais de um alvo)
+--        data_split_method='AUTO_SPLIT'  quem separa treino/validacao
+--        enable_global_explain=TRUE      guarda o peso de cada coluna
+--                                        durante o treino. Se voce nao
+--                                        ligar AGORA, o PASSO 4 nao
+--                                        funciona depois — e a unica
+--                                        opcao aqui que voce nao
+--                                        consegue "ligar mais tarde".
+--
+--   3) O SELECT depois do AS e a materia-prima. Vale a regra:
+--        a coluna citada em input_label_cols  ->  label
+--        TODAS as outras que aparecerem       ->  features
+--      Nao existe lista de features em lugar nenhum. Colocar uma
+--      coluna no SELECT E adicionar uma feature. Tirar do SELECT E
+--      remover. Toda a engenharia de features desta aula acontece
+--      editando este SELECT.
+--
+--      Por isso ele NAO e SELECT *: id_anuncio viraria feature,
+--      preco_por_m2 tambem, e descricao tambem. Guarde isso.
+--
+-- Pergunta para a turma antes de seguir:
+--   onde esta o train_test_split nesse comando?
+--   (resposta: e a linha data_split_method. Voce nao escreve o split,
+--    voce escolhe a POLITICA de split — e ela fica gravada no modelo,
+--    nao num notebook que alguem esqueceu de rodar)
+-- =====================================================================
+
 -- TRES COISAS PARA DESTACAR:
 --
 -- 1) input_label_cols diz QUAL coluna e a resposta.
@@ -55,7 +103,7 @@ FROM `SEU_PROJETO.SEU_DATASET.imoveis_gold`;
 --   "Por que a descricao NAO esta nessa lista?"
 --   Anote o seu palpite. A resposta esta no ml_05_armadilha.sql.
 --
--- CUSTO: ~700 linhas, 10 colunas. Cabe folgado no free tier de 1 TB.
+-- CUSTO: ~890 linhas, 10 colunas. Cabe folgado no free tier de 1 TiB.
 
 
 -- ---------------------------------------------------------------------
@@ -105,6 +153,46 @@ FROM ML.PREDICT(
 )
 ORDER BY ABS(predicted_preco - preco) DESC
 LIMIT 20;
+
+-- =====================================================================
+-- COMO LER ESTE COMANDO
+-- =====================================================================
+-- ML.PREDICT nao e uma funcao normal: ela aparece no FROM, no lugar
+-- onde iria o nome de uma tabela. Porque e isso que ela devolve —
+-- uma tabela.
+--
+--   FROM ML.PREDICT(
+--     MODEL `...modelo_preco`,                         <- quem prevê
+--     (SELECT * FROM `...imoveis_gold`)                <- sobre o quê
+--   )
+--
+--   Entra:  a tabela do segundo argumento, como ela e.
+--   Sai:    a MESMA tabela, com uma coluna nova na frente:
+--           predicted_preco. O nome e sempre "predicted_" + o nome
+--           do label. Voce nao escolhe, e nao precisa declarar.
+--
+--   Como sobrou tudo o que entrou, da para escrever
+--   `predicted_preco - preco` na mesma linha: previsao e verdade
+--   estao lado a lado, na mesma linha da mesma tabela.
+--
+--   O segundo argumento e uma query entre parenteses, entao ele pode
+--   ser QUALQUER coisa: a tabela inteira (aqui), so um bairro, uma
+--   tabela nova que chegou ontem, ou um imovel inventado na mao
+--   (e isso e o PASSO 5).
+--
+--   ORDER BY ABS(predicted_preco - preco) DESC
+--     ABS tira o sinal. Sem ele, o topo da lista seria so quem o
+--     modelo subestimou muito, e voce perderia metade dos erros.
+--     Erro de R$ 3 milhoes para cima e para baixo pesa igual.
+--
+-- Pergunta para a turma antes de seguir:
+--   a tabela que entrou no ML.PREDICT contem as MESMAS linhas com que
+--   o modelo treinou. Isso invalida o que a gente esta olhando aqui?
+--   (resposta: para julgar QUALIDADE, sim — para isso existe o
+--    ML.EVALUATE do passo anterior. Para procurar PADRAO no erro,
+--    nao: o que a gente quer aqui e descobrir quem o modelo erra,
+--    e ele errar feio ate em quem ele ja viu e informacao boa)
+-- =====================================================================
 
 -- Ordenado pelos MAIORES erros de proposito.
 --

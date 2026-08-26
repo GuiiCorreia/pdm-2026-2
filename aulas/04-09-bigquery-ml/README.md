@@ -15,17 +15,23 @@ No fim da aula você vai ter, na sua conta, treinado por você:
 ## Antes de começar
 
 - [ ] Ambiente montado conforme [`../../docs/01-monte-seu-ambiente-gcp.md`](../../docs/01-monte-seu-ambiente-gcp.md)
-- [ ] `aula-pdm.csv` no seu bucket do Cloud Storage
-- [ ] Dataset criado no BigQuery
+- [ ] Dataset criado no BigQuery, **em `us-east1`**
 - [ ] Você deu uma olhada no [dicionário de dados](../../dados/README.md)
 
-**Todos os scripts usam três placeholders.** Antes de rodar qualquer coisa, troque nos seis arquivos:
+Você **não precisa subir o `.csv`**. O dado da disciplina já está num bucket público:
+
+```
+gs://pdm-2026-2-dados/imoveis/aula-pdm.csv
+```
+
+Ele está em `us-east1` — por isso o seu dataset também tem que estar. Bucket e dataset em regiões diferentes: o BigQuery se recusa a ler.
+
+**Todos os scripts usam dois placeholders.** Antes de rodar qualquer coisa, troque nos seis arquivos:
 
 | Placeholder | Troque por |
 |---|---|
 | `SEU_PROJETO` | o id do seu projeto no GCP |
-| `SEU_DATASET` | o nome do dataset que você criou no BigQuery |
-| `SEU_BUCKET` | o nome do seu bucket no Cloud Storage |
+| `SEU_DATASET` | o nome do dataset que você criou no BigQuery (`pdm_2026_2`) |
 
 No editor, é um "substituir em todos os arquivos". Se esquecer, o BigQuery vai reclamar de tabela não encontrada e você vai perder cinco minutos procurando o motivo errado.
 
@@ -63,6 +69,26 @@ Rode nesta ordem. Cada um depende do anterior.
 
 ---
 
+## Os blocos "COMO LER ESTE COMANDO"
+
+Nos comandos mais densos, logo **depois** do SQL, tem um bloco assim:
+
+```
+-- =====================================================================
+-- COMO LER ESTE COMANDO
+-- =====================================================================
+```
+
+Ele destrincha a query pedaço por pedaço: o que cada função faz, por que ela está ali, e o que quebra se você tirar. Quase sempre a leitura é **de dentro para fora**, começando pelo miolo.
+
+Cada bloco termina com uma **pergunta**, com a resposta logo abaixo entre parênteses. Vale mais tentar responder antes de ler.
+
+Copiar SQL que funciona é fácil. O que faz diferença no Trabalho 1 é conseguir olhar para uma query de outra pessoa e dizer o que ela faz — e é para isso que esses blocos existem.
+
+Nem todo comando tem um. Os de conferência (`SELECT COUNT(*)`) não precisam.
+
+---
+
 ## Os três verbos
 
 A aula inteira cabe em três comandos. Repare que você já conhece o primeiro verbo:
@@ -81,7 +107,7 @@ ML.PREDICT     (MODEL ..., (SELECT ...))
 
 Zero.
 
-O dataset tem 14,6 MB. O free tier do BigQuery cobre 1 TB de query processada por mês. Você teria que rodar os scripts desta aula dezenas de milhares de vezes para chegar perto do limite. Treinar modelo com `CREATE MODEL` também entra nessa conta.
+O dataset tem 14,6 MB. O free tier do BigQuery cobre 1 TiB de query processada por mês. Você teria que rodar os scripts desta aula dezenas de milhares de vezes para chegar perto do limite. Treinar modelo com `CREATE MODEL` também entra nessa conta.
 
 ---
 

@@ -14,7 +14,7 @@ Duas coisas, e a segunda vale mais que a primeira.
 
 **A técnica:** como um agente transforma texto livre em campos estruturados, e como esses campos viram um `ML.PREDICT`.
 
-**A discussão:** **API oficial versus API não oficial.** Esse é um assunto que você vai encarar na vida profissional em algum momento — provavelmente antes do que imagina, e provavelmente com um cliente te pedindo a opção errada.
+**A discussão:** **API oficial e API não oficial** — o que é cada uma, como se entra, o que muda entre elas. Assunto que aparece cedo na vida profissional.
 
 ---
 
@@ -49,70 +49,50 @@ Você vai escolher um. Os dois entregam o mesmo agente; muda o que está entre e
 | Node no n8n | nativo (Telegram Trigger) | HTTP Request + Webhook |
 | Como conecta | token do BotFather | QR code, sessão de aparelho |
 | Precisa de número? | não | sim, um número real |
-| Risco de banimento | nenhum | **real** |
 | Custo | zero | varia por provedor |
-| Reprodutível na sua máquina | sim | sim, com o risco acima |
+| Bloqueio do número | não se aplica | possível |
 
-**A minha recomendação para você fazer em casa é o Telegram.** Não é o caminho "mais fraco" — é o caminho onde o aprendizado é idêntico e o risco é zero.
+**Para fazer em casa, sugiro o Telegram**: o aprendizado é o mesmo e você não precisa expor um número.
 
-**O WhatsApp não oficial eu demonstro ao vivo**, no meu número, para vocês verem funcionando e para a gente ter a conversa que vem a seguir com um exemplo concreto na tela.
+**O WhatsApp não oficial eu demonstro ao vivo**, no meu número, para vocês verem funcionando com um exemplo concreto na tela.
 
 ---
 
-## API oficial versus não oficial
+## API oficial e API não oficial
 
-Essa parte não é filosofia. É a diferença entre um sistema que sobrevive e um que morre numa terça-feira.
+Existem dois caminhos para colocar software para conversar pelo WhatsApp. Eles são diferentes em quase tudo: como você entra, quanto custa, o que pode e o que acontece quando dá problema.
+
+Vale conhecer os dois, porque na vida profissional você vai esbarrar nos dois.
 
 ### O que é cada uma
 
-**Oficial** — a WhatsApp Business Platform (Cloud API), da Meta. Você se cadastra, verifica o negócio, usa modelos de mensagem aprovados e paga por mensagem. É um contrato.
+**Oficial** — a WhatsApp Business Platform (Cloud API), da Meta. Você cadastra um negócio, passa por verificação, usa modelos de mensagem aprovados e paga pelas mensagens. É uma relação contratual com a Meta.
 
-**Não oficial** — bibliotecas e serviços que conversam com o WhatsApp fingindo ser o WhatsApp Web. Você lê um QR code com o celular e a sessão fica de pé. Não tem cadastro, não tem aprovação, não tem contrato — e é aí que mora tudo.
+**Não oficial** — bibliotecas e serviços que conversam com o WhatsApp se apresentando como o WhatsApp Web. Você lê um QR code com o celular e a sessão fica de pé. Não há cadastro nem aprovação.
 
-### Por que a não oficial é tentadora
+### Lado a lado
 
-Ela é honestamente atraente, e ignorar isso seria desonesto:
+| | Oficial (Cloud API) | Não oficial |
+|---|---|---|
+| **Entrada** | Business Manager, verificação de negócio com CNPJ, número dedicado que não pode estar ativo no app comum | QR code, minutos |
+| **Custo** | por mensagem, em quatro categorias: marketing, utilidade, autenticação e serviço | plano do provedor ou auto-hospedado |
+| **Mensagens** | modelos aprovados pela Meta para iniciar conversa | texto livre |
+| **Volume** | começa em 250 destinatários únicos/24h, sobe por faixas (2.000 → 10.000 → 100.000 → ilimitado) | sem faixa definida |
+| **Suporte** | canal da Meta, documentação versionada | do provedor, quando existe |
+| **Estabilidade** | mudanças anunciadas | pode parar sem aviso quando o protocolo muda |
+| **Termos de uso** | é o uso previsto | os Termos do WhatsApp proíbem engenharia reversa e APIs substancialmente similares |
 
-- funciona em minutos, não em dias
-- não precisa de verificação de negócio nem de CNPJ
-- não tem modelo de mensagem para aprovar
-- manda mensagem para quem você quiser, na hora
-- é barata
+> Sobre os Termos: eles proíbem, entre outras coisas, "fazer engenharia reversa, alterar, modificar, criar obras derivadas, descompilar ou extrair código dos nossos Serviços" e "criar software ou APIs que funcionem substancialmente da mesma forma que os nossos Serviços e oferecê-los para uso de terceiros de forma não autorizada". Na prática, o risco concreto é o **número** ser bloqueado.
 
-Para um protótipo, uma demo, um trabalho de faculdade, ela resolve.
+*Preços, faixas e regras consultados em 25/08/2026. Isso muda com frequência — confira na documentação da Meta antes de orçar qualquer coisa.*
 
-### Por que ela quebra
+### Por que a aula usa a não oficial
 
-Os **Termos de Serviço do WhatsApp** proíbem, entre outras coisas, "fazer engenharia reversa, alterar, modificar, criar obras derivadas, descompilar ou extrair código dos nossos Serviços" e "criar software ou APIs que funcionem substancialmente da mesma forma que os nossos Serviços e oferecê-los para uso de terceiros de forma não autorizada".
+Por um motivo prático: **é o que cabe numa aula.** A oficial exige CNPJ, verificação de negócio e um número dedicado — nada disso um aluno monta em duas horas para fazer o exercício junto.
 
-Um cliente que imita o WhatsApp Web cai exatamente aí. Na prática, isso quer dizer:
+Isso não é um veredito sobre qual das duas é melhor. A escolha real, num projeto real, depende do contexto: quem é o cliente, qual o volume, quem assume o risco, quanto tempo você tem. **O que eu quero é que vocês conheçam as duas e saibam fazer essa conta.**
 
-- **o número pode ser banido**, e quem é banido normalmente é o número, não o servidor
-- não existe SLA, não existe suporte, não existe recurso — você não tem com quem falar
-- **a quebra é silenciosa e sem aviso**: o WhatsApp muda um detalhe do protocolo e a sua integração para de funcionar numa quarta-feira de manhã, sem changelog
-
-O ponto que eu quero que fique: **o risco não é técnico, é de negócio.** O código funciona. O que não é confiável é a permissão para o código continuar funcionando.
-
-### E a oficial, por que não é sempre a resposta
-
-Porque ela tem um preço, e não é só o financeiro:
-
-- **cobrança por mensagem**, com categorias diferentes (marketing, utilidade, autenticação, serviço) e regras que mudam de tempos em tempos
-- **não existe camada gratuita para desenvolvimento** — o modelo antigo de conversas grátis por mês acabou
-- **limite inicial de 250 destinatários únicos por 24 horas** para um portfólio novo. Você sobe de faixa (2.000 → 10.000 → 100.000 → ilimitado) conforme verifica o negócio e mantém boa qualidade
-- verificação de negócio, modelos de mensagem para aprovar, e a burocracia que vem junto
-
-### A resposta profissional
-
-Não é "sempre oficial" nem "oficial quando der". É:
-
-> **Protótipo em qualquer coisa. Produção com o número de um cliente, só oficial.**
-
-E, quando você for defender isso numa reunião, o argumento que funciona não é "os termos proíbem". É este: *o número de atendimento da empresa é um ativo. Colocar esse ativo em cima de uma integração que pode ser desligada sem aviso é um risco que ninguém aceita quando entende o que está aceitando.*
-
-Se você sair desta aula só com essa frase, ela já valeu.
-
-> Ah, e vale a pena saber: os provedores não oficiais existem, são um mercado grande e boa parte deles é honesta sobre o que é. **O problema não é o provedor — é a base em que ele está de pé.**
+O que a gente monta hoje — gatilho, contexto, modelo, resposta — **é o mesmo dos dois lados**. Muda o node de entrada e o node de saída. O miolo, que é o que interessa nesta disciplina, é idêntico.
 
 ---
 

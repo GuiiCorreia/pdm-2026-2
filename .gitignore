@@ -35,8 +35,10 @@ workflows/*-com-credenciais.json
 # =============================================================================
 # Dados pesados e gerados
 # =============================================================================
-# O dataset de 1.000 anuncios (aula-pdm.csv) E versionado de proposito,
-# para o aluno so precisar de git clone. O dump completo, nao.
+# O dataset COMPLETO (1.000 anuncios) nao vai para o repositorio: ele
+# mora no bucket publico da disciplina e o BigQuery le direto de la.
+# No git fica so a amostra de 100 linhas (dados/amostra-100.csv).
+dados/aula-pdm.csv
 dados/dump-completo/
 dados/*.parquet
 dados/*.jsonl

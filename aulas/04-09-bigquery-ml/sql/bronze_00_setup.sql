@@ -8,8 +8,7 @@
 --
 -- ANTES DE EXECUTAR, substitua nos SEIS arquivos desta pasta:
 --     SEU_PROJETO   -> o id do seu projeto no GCP
---     SEU_DATASET   -> o dataset que voce criou no BigQuery
---     SEU_BUCKET    -> o seu bucket no Cloud Storage
+--     SEU_DATASET   -> o dataset que voce criou no BigQuery (pdm_2026_2)
 --
 -- No editor, isso e um "substituir em todos os arquivos".
 -- Se esquecer, o BigQuery reclama de tabela nao encontrada e voce
@@ -20,14 +19,19 @@
 
 
 -- ---------------------------------------------------------------------
--- PASSO 1 — Subir o arquivo para o Cloud Storage
+-- PASSO 1 — Onde o arquivo esta
 -- ---------------------------------------------------------------------
--- Pelo console: Cloud Storage > seu bucket > Upload > aula-pdm.csv
--- Destino sugerido: gs://SEU_BUCKET/imoveis/aula-pdm.csv
+-- Voce nao precisa subir nada. O dado da disciplina ja esta publicado
+-- num bucket publico, em us-east1:
+--
+--     gs://pdm-2026-2-dados/imoveis/aula-pdm.csv
 --
 -- Por que GCS e nao upload direto no BigQuery?
 -- Porque e assim que funciona de verdade: o dado chega em um bucket,
 -- e o BigQuery le de la. E o mesmo caminho que voce ja percorreu.
+--
+-- ATENCAO: o SEU dataset precisa estar em us-east1 tambem. Bucket e
+-- dataset em regioes diferentes = o BigQuery se recusa a ler.
 
 
 -- ---------------------------------------------------------------------
@@ -48,12 +52,62 @@ CREATE OR REPLACE EXTERNAL TABLE `SEU_PROJETO.SEU_DATASET.imoveis_bronze`
 )
 OPTIONS (
   format = 'CSV',
-  uris = ['gs://SEU_BUCKET/imoveis/aula-pdm.csv'],
+  uris = ['gs://pdm-2026-2-dados/imoveis/aula-pdm.csv'],
   skip_leading_rows = 1,
   quote = '"',
   allow_quoted_newlines = TRUE,
   ignore_unknown_values = TRUE
 );
+
+-- =====================================================================
+-- COMO LER ESTE COMANDO
+-- =====================================================================
+-- Compare com um CREATE TABLE comum. A diferenca esta em UMA palavra
+-- e no que vem depois dela:
+--
+--   CREATE ... EXTERNAL TABLE nome (colunas)  OPTIONS (onde e como ler)
+--                  |
+--                  +-- "a tabela nao guarda dado, ela aponta pro arquivo"
+--
+-- Em tabela normal voce diz o que a tabela E. Aqui voce diz onde o
+-- arquivo esta e como interpretar ele. Nada e copiado: o CSV continua
+-- no bucket, e cada consulta vai ler ele de novo, la.
+--
+-- O bloco de colunas: voce esta DECLARANDO o schema, nao descobrindo.
+-- O BigQuery ate consegue adivinhar sozinho, mas aqui a gente escreve
+-- na mao de proposito — declarar `listing STRING` e o que impede o
+-- BigQuery de tentar ser esperto com o JSON. Ele fica como texto, e a
+-- gente abre ele no proximo arquivo, no nosso tempo.
+--
+-- E cada OPTION resolve um problema concreto deste arquivo:
+--
+--   format = 'CSV'            e um CSV. (Poderia ser PARQUET, JSON...)
+--   uris = ['gs://...']       o caminho no bucket. E LISTA, entre
+--                             colchetes: da pra apontar para varios
+--                             arquivos, e aceita curinga
+--                             ('gs://.../2024-*.csv' = a pasta toda
+--                             virando uma tabela so).
+--   skip_leading_rows = 1     a primeira linha e o cabecalho, e nao
+--                             um anuncio chamado "id_anuncio".
+--   quote = '"'               o que delimita um campo de texto.
+--   allow_quoted_newlines = TRUE
+--                             ESTA E A IMPORTANTE. O JSON da coluna
+--                             listing tem quebras de linha DENTRO
+--                             dele. Sem esta opcao, o leitor de CSV
+--                             acha que a linha acabou no meio do JSON
+--                             e o arquivo inteiro sai picado.
+--   ignore_unknown_values = TRUE
+--                             se alguma linha vier com coluna a mais,
+--                             ignora aquilo em vez de falhar tudo.
+--
+-- Pergunta para a turma antes de seguir:
+--   se alguem trocar o arquivo la no bucket, o que acontece com esta
+--   tabela?
+--   (resposta: muda sozinha, na proxima consulta. Isso e comodo e e
+--    perigoso — a sua tabela depende de um arquivo que outra pessoa
+--    pode mexer. E um dos motivos pelos quais a Silver, la na frente,
+--    e uma tabela DE VERDADE e nao mais um ponteiro)
+-- =====================================================================
 
 
 -- ---------------------------------------------------------------------
@@ -90,11 +144,10 @@ LIMIT 1;
 -- ---------------------------------------------------------------------
 -- ANTES DE SEGUIR PARA O silver_01_json.sql
 -- ---------------------------------------------------------------------
--- [ ] O bucket existe e o aula-pdm.csv foi enviado para imoveis/
 -- [ ] A External Table foi criada sem erro
 -- [ ] O PASSO 3 retornou 1000
 -- [ ] O PASSO 4 mostrou a parede de texto
 --
--- Deu erro de localizacao? Bucket e dataset precisam estar na MESMA
--- regiao, e a regiao do dataset nao pode ser alterada depois.
--- Nesse caso, apague o dataset e crie de novo na regiao do bucket.
+-- Deu erro de localizacao? O seu dataset nao esta em us-east1.
+-- A regiao do dataset nao pode ser alterada depois: apague o dataset
+-- e crie de novo em us-east1.

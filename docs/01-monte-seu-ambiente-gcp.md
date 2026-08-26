@@ -79,44 +79,44 @@ Se alguma já aparecer como "Gerenciar" em vez de "Ativar", é porque já está 
 
 ---
 
-## Passo 4 — Criar o bucket
+## Passo 4 — O dado da aula já está num bucket
 
-O bucket é onde o arquivo `.csv` vai morar. Aqui tem uma escolha que **importa de verdade**, e é a única do guia inteiro que você não pode desfazer depois.
-
-### A região
-
-A camada Always Free do Cloud Storage **só existe em três regiões, todas nos Estados Unidos**:
+Você **não precisa subir o `.csv` em lugar nenhum**. O dataset da disciplina já está publicado num bucket público:
 
 ```
-us-east1     us-west1     us-central1
+gs://pdm-2026-2-dados/imoveis/aula-pdm.csv
 ```
 
-Se você criar o bucket em `southamerica-east1` (São Paulo), ele sai do Always Free. Não é caro — falamos de centavos com 14 MB — mas deixa de ser zero, e o objetivo aqui é zero.
+É leitura pública. Não precisa de senha, de chave, nem de permissão. Se quiser conferir agora, cole no navegador:
 
-**Use `us-central1`.** Bucket e dataset, os dois.
+```
+https://storage.googleapis.com/pdm-2026-2-dados/imoveis/aula-pdm.csv
+```
 
-> **Por que os dois na mesma região:** para o BigQuery ler um arquivo do Cloud Storage, **o bucket e o dataset precisam estar no mesmo local**. E o local do dataset é **imutável** — para mudar, só apagando e criando de novo. É por isso que este passo vem antes do BigQuery: a escolha aqui amarra a próxima.
+O download começa. São 14,6 MB.
 
-### Criando
+> **Por que assim.** Se cada um subisse o próprio arquivo, a primeira aula viraria uma hora de "meu caminho está errado" e "meu bucket está em outra região". O dado é o mesmo para todo mundo — então ele mora num lugar só. O que é **seu** é o processamento: o projeto, o dataset, as tabelas, os modelos. É lá que o trabalho acontece.
+
+### A região — a única escolha irreversível do guia
+
+O bucket da disciplina está em **`us-east1`**.
+
+Para o BigQuery ler um arquivo do Cloud Storage, **o bucket e o dataset precisam estar no mesmo local**. Como o bucket está em `us-east1`, o **seu dataset também tem que estar em `us-east1`**. E o local do dataset é **imutável**: para mudar, só apagando e criando de novo.
+
+Se você errar isso, o erro que aparece daqui a duas telas não vai mencionar região nenhuma.
+
+> `us-east1` também é uma das três regiões onde existe a camada Always Free do Cloud Storage (as outras são `us-west1` e `us-central1`) — o que importa quando você criar o seu próprio bucket, no passo 4b.
+
+### Passo 4b — O seu bucket (opcional agora, obrigatório em 27/11)
+
+Para a aula de 04/09 você não precisa de bucket. Mas na aula de **27/11** o agente vai guardar fotos de imóveis no Cloud Storage, e aí o bucket é seu. Criar leva um minuto — vale fazer junto:
 
 1. Menu de navegação → **Cloud Storage** → **Buckets** → **Criar**
 2. **Nome**: precisa ser único no mundo inteiro. Use o seu ID de projeto como prefixo, por exemplo `pdm-2026-2-471203-dados`
-3. **Onde armazenar**: `Region` → **`us-central1`**
+3. **Onde armazenar**: `Region` → **`us-east1`** ← a mesma de tudo
 4. **Classe**: `Standard`
 5. Controle de acesso: deixe o padrão (**uniforme**, com acesso público bloqueado)
 6. Criar
-
-### Subindo o arquivo
-
-Dentro do bucket, crie uma pasta `imoveis` e faça upload do `dados/aula-pdm.csv` que veio no `git clone`.
-
-O caminho final tem que ficar exatamente assim:
-
-```
-gs://SEU_BUCKET/imoveis/aula-pdm.csv
-```
-
-Anote esse caminho. Ele vai no primeiro script SQL da aula.
 
 ---
 
@@ -127,24 +127,24 @@ O dataset é o equivalente a um "banco" dentro do BigQuery — a pasta onde fica
 1. Menu de navegação → **BigQuery**
 2. No painel Explorer à esquerda, ache o seu projeto, clique nos três pontinhos → **Criar conjunto de dados** (*Create dataset*)
 3. **ID do conjunto de dados**: `pdm_2026_2`
-4. **Tipo de local**: `Region` → **`us-central1`** ← a mesma do bucket
+4. **Tipo de local**: `Region` → **`us-east1`** ← a mesma do bucket da disciplina
 5. Criar
 
 > **Underscore, não hífen.** Nome de dataset no BigQuery aceita letras, números e `_`. Se você digitar `pdm-2026-2` ele recusa.
 
-**Confira antes de seguir:** clique no dataset e olhe o painel de detalhes. O campo `Data location` tem que dizer `us-central1`. Se disser outra coisa, apague e crie de novo **agora** — daqui a duas telas isso vira um erro que não parece ter nada a ver com região.
+**Confira antes de seguir:** clique no dataset e olhe o painel de detalhes. O campo `Data location` tem que dizer `us-east1`. Se disser outra coisa, apague e crie de novo **agora**.
 
 ---
 
 ## Passo 6 — Testar
 
-Este é o teste que prova que os passos 4 e 5 se conversam. Abra uma aba de query no BigQuery e rode, trocando os três placeholders:
+Este é o teste que prova que o seu dataset consegue ler o bucket da disciplina. Abra uma aba de query no BigQuery e rode, trocando só os **dois** placeholders:
 
 ```sql
 CREATE OR REPLACE EXTERNAL TABLE `SEU_PROJETO.SEU_DATASET.teste_ambiente`
 OPTIONS (
   format = 'CSV',
-  uris = ['gs://SEU_BUCKET/imoveis/aula-pdm.csv'],
+  uris = ['gs://pdm-2026-2-dados/imoveis/aula-pdm.csv'],
   skip_leading_rows = 1
 );
 
@@ -157,10 +157,10 @@ FROM `SEU_PROJETO.SEU_DATASET.teste_ambiente`;
 | Se deu | O que é |
 |---|---|
 | `1000` | ambiente montado. Pode apagar a `teste_ambiente`, ela não serve para mais nada |
-| erro de localização / *dataset and bucket must be in the same location* | região do dataset ≠ região do bucket. Apague o dataset e refaça o passo 5 |
-| `Not found: URIs` | o caminho do arquivo está errado. Confira maiúsculas e a pasta `imoveis/` |
+| erro de localização / *dataset and bucket must be in the same location* | seu dataset não está em `us-east1`. Apague e refaça o passo 5 |
 | `Access Denied` | a API do Cloud Storage não foi ativada, ou o faturamento não está vinculado |
-| número diferente de 1000 | você subiu outro arquivo, ou esqueceu o `skip_leading_rows = 1` |
+| `Not found: URIs` | o caminho foi digitado errado. Copie e cole do bloco acima |
+| número diferente de 1000 | você esqueceu o `skip_leading_rows = 1` |
 
 **Uma External Table não copia o arquivo.** Ela é um ponteiro: o dado continua no bucket e o BigQuery lê de lá na hora da query. É por isso que criar essa tabela é instantâneo mesmo com 14 MB — e é o conceito que abre a aula de 04/09.
 
@@ -221,9 +221,7 @@ Antes da aula de 04/09, você tem que conseguir marcar todos:
 - [ ] Projeto criado e **ID anotado**
 - [ ] Faturamento vinculado ao projeto
 - [ ] BigQuery API, Cloud Storage e BigQuery Connection API ativadas
-- [ ] Bucket em **`us-central1`**
-- [ ] `aula-pdm.csv` em `gs://SEU_BUCKET/imoveis/`
-- [ ] Dataset `pdm_2026_2` em **`us-central1`** (a mesma região do bucket)
+- [ ] Dataset `pdm_2026_2` em **`us-east1`** (a mesma região do bucket da disciplina)
 - [ ] O teste do passo 6 retornou **1000**
 - [ ] Chave do Gemini criada e colada no `.env`
 - [ ] Alerta de orçamento de US$ 5 configurado

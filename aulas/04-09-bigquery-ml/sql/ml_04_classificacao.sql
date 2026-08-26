@@ -24,6 +24,44 @@ WHERE uso IS NOT NULL
 GROUP BY uso
 ORDER BY anuncios DESC;
 
+-- =====================================================================
+-- COMO LER ESTE COMANDO
+-- =====================================================================
+-- GROUP BY uso quebra a tabela em grupos — um por valor distinto de
+-- uso. Cada linha do resultado passa a ser um grupo, e COUNT(*) conta
+-- dentro do grupo. Ate aqui, SQL de sempre.
+--
+-- O pedaco estranho e o percentual:
+--
+--   SUM(COUNT(*)) OVER ()
+--       |    |        |
+--       |    |        +-- OVER () = "sobre TODAS as linhas do resultado"
+--       |    +----------- ja agregado: o total de cada grupo
+--       +---------------- soma esses totais = o total geral
+--
+--   Le-se de dentro pra fora, em duas etapas:
+--     1) COUNT(*) roda por grupo        -> 700 e 190, por exemplo
+--     2) SUM(...) OVER () roda DEPOIS, por cima do resultado ja
+--        agrupado, e devolve 890 em TODAS as linhas
+--
+--   O OVER() e o que faz disso uma "window function": em vez de
+--   colapsar linhas como uma agregacao normal, ela calcula um valor
+--   olhando uma janela de linhas e devolve o resultado em cada uma.
+--   Aqui a janela e vazia — OVER () sem nada dentro significa
+--   "a tabela inteira".
+--
+--   Sem isso, para ter o percentual voce precisaria rodar uma query
+--   so para descobrir o total, anotar o numero, e escrever ele na
+--   mao na segunda query. Que e exatamente o que quebra quando a
+--   base cresce.
+--
+-- Pergunta para a turma antes de seguir:
+--   por que nao da para escrever so COUNT(*) / COUNT(*) ali?
+--   (resposta: as duas contas rodariam dentro do MESMO grupo, e todo
+--    percentual daria 100%. O OVER() e o que muda o escopo de UM
+--    dos dois lados da divisao)
+-- =====================================================================
+
 -- ESPERADO (aproximado, na base completa): RESIDENTIAL ~79% / COMMERCIAL ~21%
 --
 -- PERGUNTA — responda ANTES de treinar:
@@ -144,6 +182,57 @@ FROM ML.PREDICT(
 WHERE uso <> predicted_uso
 ORDER BY confianca DESC
 LIMIT 20;
+
+-- =====================================================================
+-- COMO LER ESTE COMANDO
+-- =====================================================================
+-- O ML.PREDICT e igualzinho ao do ml_03: modelo, tabela, e volta a
+-- tabela com colunas novas na frente. A diferenca e que classificacao
+-- devolve DUAS colunas novas, nao uma:
+--
+--   predicted_uso        o rotulo escolhido:  "RESIDENTIAL"
+--   predicted_uso_probs  a nota de cada classe, num ARRAY de STRUCT:
+--                        [ {label:"RESIDENTIAL", prob:0.93},
+--                          {label:"COMMERCIAL",  prob:0.07} ]
+--
+--   STRUCT e um registro com campos nomeados — o equivalente de um
+--   dicionario. Por isso p.prob, com ponto, e nao JSON_VALUE.
+--
+-- Para tirar um numero de dentro desse array:
+--
+--   (SELECT MAX(p.prob) FROM UNNEST(predicted_uso_probs) AS p)
+--
+--   1) UNNEST(...) AS p    o array vira LINHAS, uma por classe.
+--                          Exatamente o mesmo UNNEST que abriu o
+--                          pricingInfos no comeco da aula — la o
+--                          elemento era JSON, aqui e STRUCT.
+--   2) MAX(p.prob)         a maior probabilidade entre elas. Como o
+--                          modelo escolhe sempre a classe de maior
+--                          prob, esse MAX e a confianca da resposta
+--                          que ele deu.
+--   3) ( ... )             subquery escalar de novo: uma query usada
+--                          como coluna, obrigada a devolver um valor.
+--                          MAX garante isso sozinho — nao precisa de
+--                          LIMIT 1 aqui.
+--
+--   E REPARE ONDE FICA O 3:
+--     ROUND( (SELECT MAX(...) ... ), 3 )
+--     ele e o segundo argumento do ROUND, do lado de fora dos
+--     parenteses da subquery. Erra-se muito isso: colocar o ", 3"
+--     dentro da subquery vira "SELECT MAX(...), 3" — duas colunas,
+--     e a subquery escalar quebra.
+--
+--   O filtro WHERE uso <> predicted_uso roda DEPOIS da previsao:
+--   voce so consegue filtrar por predicted_uso porque, naquele
+--   ponto, ele ja e uma coluna comum da tabela que saiu do PREDICT.
+--
+-- Pergunta para a turma antes de seguir:
+--   com duas classes, qual e o MENOR valor que essa coluna confianca
+--   pode assumir?
+--   (resposta: 0,5. As probabilidades somam 1, entao a maior nunca
+--    fica abaixo da metade. Um modelo com confianca 0,51 esta
+--    literalmente jogando moeda — e isso nao aparece no accuracy)
+-- =====================================================================
 
 -- REPARE NO predicted_uso_probs:
 --   classificacao no BQML nao devolve so o rotulo. Devolve a

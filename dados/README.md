@@ -2,12 +2,39 @@
 
 Anúncios reais de imóveis, coletados do GrupoZAP/VivaReal. **999 dos 1.000 anúncios são de Goiânia.**
 
-| | |
-|---|---|
-| Arquivo | `aula-pdm.csv` |
-| Tamanho | 14,6 MB |
-| Linhas | 1.000 |
-| Colunas | 4 |
+## Onde está o dado
+
+O arquivo completo **não está neste repositório**. Ele mora num bucket público do Cloud Storage:
+
+```
+gs://pdm-2026-2-dados/imoveis/aula-pdm.csv
+```
+
+Para baixar, ou só espiar no navegador:
+
+```
+https://storage.googleapis.com/pdm-2026-2-dados/imoveis/aula-pdm.csv
+```
+
+É leitura pública: não precisa de conta, de chave nem de permissão. **E você não precisa baixar** — o BigQuery lê direto do bucket, que é exatamente o que os scripts da aula fazem.
+
+| | Completo (no bucket) | Amostra (neste repo) |
+|---|---|---|
+| Arquivo | `aula-pdm.csv` | `dados/amostra-100.csv` |
+| Linhas | 1.000 | 100 |
+| Tamanho | 14,6 MB | 1,3 MB |
+| Colunas | 4 | 4 |
+| Região | `us-east1` | — |
+
+## Sobre a amostra
+
+O `amostra-100.csv` é um **sorteio aleatório** de 100 dos 1.000 anúncios, com semente fixa — então é sempre o mesmo recorte para todo mundo. Ele existe para você abrir num editor, no pandas ou no Excel e ver a cara do dado sem baixar 14 MB.
+
+**Não use a amostra para tirar conclusões numéricas.** Com 100 linhas, qualquer proporção que você medir tem margem de erro grande. Os números desta página, e os que aparecem nas queries da aula, vêm todos do arquivo completo.
+
+> **Um aviso que vale a disciplina inteira:** se você fosse amostrar por conta própria pegando "as primeiras 100 linhas", ia se enganar feio. **O arquivo vem ordenado**, e os registros mais estranhos estão concentrados no começo: as 100 primeiras linhas têm **29%** de preços inflados, contra **2,9%** no arquivo inteiro — dez vezes mais.
+>
+> Amostra é sorteio, não é fatia. É por isso que o `amostra-100.csv` foi sorteado, e não cortado.
 
 ---
 
@@ -85,7 +112,7 @@ Quando a média é o dobro da mediana e o desvio-padrão é maior que a média, 
 
 ## Dump completo
 
-O arquivo versionado aqui tem 1.000 linhas — é a amostra, e serve para tudo que a gente faz em sala. O dump completo é maior e fica fora do repositório (`dados/dump-completo/` está no `.gitignore`). Os scripts SQL funcionam igual nos dois: só muda a tabela de origem.
+Os 1.000 anúncios do bucket já são um recorte: o dump original é bem maior e fica fora do repositório (`dados/dump-completo/` está no `.gitignore`). Os scripts SQL funcionam igual nos dois — só muda a tabela de origem.
 
 ---
 
@@ -94,7 +121,12 @@ O arquivo versionado aqui tem 1.000 linhas — é a amostra, e serve para tudo q
 Tem um perfilador em [`../ferramentas/perfilar_dataset.py`](../ferramentas/perfilar_dataset.py). Só biblioteca padrão do Python, sem pandas, roda em segundos:
 
 ```bash
-python3 ferramentas/perfilar_dataset.py dados/aula-pdm.csv
+# na amostra que veio no clone
+python3 ferramentas/perfilar_dataset.py dados/amostra-100.csv
+
+# ou no arquivo completo, depois de baixar do bucket
+curl -O https://storage.googleapis.com/pdm-2026-2-dados/imoveis/aula-pdm.csv
+python3 ferramentas/perfilar_dataset.py aula-pdm.csv
 ```
 
 Ele achata o JSON, conta preenchimento por campo, detecta colunas constantes e sinaliza campos suspeitos. Use antes de decidir quais features entram no seu modelo.

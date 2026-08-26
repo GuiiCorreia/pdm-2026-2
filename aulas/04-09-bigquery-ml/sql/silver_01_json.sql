@@ -76,6 +76,51 @@ SELECT
 FROM `SEU_PROJETO.SEU_DATASET.imoveis_bronze`
 LIMIT 10;
 
+-- =====================================================================
+-- COMO LER ESTE COMANDO
+-- =====================================================================
+-- Tem uma query DENTRO do SELECT. Leia ela primeiro, de dentro pra fora:
+--
+--   1) JSON_QUERY_ARRAY(listing, '$.pricingInfos')
+--      Pega o pedaco do JSON que e uma lista e devolve um ARRAY.
+--      Repare na familia de funcoes:
+--        JSON_VALUE       -> devolve UM valor escalar, ja como texto
+--        JSON_QUERY_ARRAY -> devolve uma LISTA de pedacos de JSON
+--      Aqui a gente quer a lista inteira, entao e a segunda.
+--
+--   2) FROM UNNEST( ... ) AS p
+--      UNNEST transforma ARRAY em LINHAS. Uma linha por elemento.
+--      O "AS p" da um apelido a cada elemento — e p continua sendo
+--      um JSON, entao da pra fazer JSON_VALUE(p, ...) nele.
+--      (E o equivalente do explode() do pandas, dentro do FROM.)
+--
+--   3) WHERE JSON_VALUE(p, '$.businessType') = 'SALE'
+--      Agora que virou linha, filtrar e SQL normal.
+--      E exatamente isto que resolve o problema: em vez de apostar
+--      que a venda e o item [0], a gente PROCURA a venda.
+--
+--   4) SELECT JSON_VALUE(p, '$.price')
+--      Da linha que sobrou, pega o preco.
+--
+--   5) LIMIT 1
+--      Nao e enfeite. Os parenteses em volta de tudo isso fazem uma
+--      SUBQUERY ESCALAR: uma query usada como se fosse uma coluna.
+--      Ela e OBRIGADA a devolver no maximo uma linha. Sem o LIMIT 1,
+--      um anuncio com duas vendas cadastradas derruba a query com
+--      "Scalar subquery produced more than one element".
+--
+-- Repare tambem: dentro da subquery a gente usa `listing`, que vem da
+-- query DE FORA. Isso tem nome — subquery correlacionada. Ela roda
+-- uma vez para cada linha da tabela de fora.
+--
+-- Pergunta para a turma antes de seguir:
+--   o que acontece com essa query se UM anuncio, entre mil, tiver
+--   dois pricingInfos do tipo SALE?
+--   (resposta: com LIMIT 1, nada. Sem ele, a query inteira falha por
+--    causa de uma linha — e falha em producao, nao no seu teste com
+--    LIMIT 10, porque essa linha provavelmente nem estava nas dez)
+-- =====================================================================
+
 -- ESTE E O CONCEITO MAIS IMPORTANTE DO BLOCO.
 -- Dado real e aninhado e irregular. O SQL do BigQuery abre isso
 -- sem voce sair do SQL.
@@ -147,6 +192,46 @@ SELECT
   SAFE_CAST(SUBSTR(JSON_VALUE(listing, '$.createdAt'), 1, 10) AS DATE) AS data_publicacao
 
 FROM `SEU_PROJETO.SEU_DATASET.imoveis_bronze`;
+
+-- =====================================================================
+-- COMO LER ESTE COMANDO
+-- =====================================================================
+-- Ele parece grande, mas nao tem nada novo. E os PASSOS 1, 2 e 3
+-- empilhados, com o tipo certo em volta de cada um. Tres formatos:
+--
+--   a) o caso simples          JSON_VALUE(listing, '$.address.city')
+--      texto que ja e texto, entra direto. Sem CAST.
+--
+--   b) o caso da lista curta   SAFE_CAST(JSON_VALUE(listing,
+--                                '$.bedrooms[0]') AS INT64)
+--      pega o item [0] e converte. Lembre do PASSO 2: JSON nao tem
+--      tipo, tudo sai como texto. Quem decide o tipo e voce, aqui.
+--
+--   c) o caso do preco         SAFE_CAST( (subquery do PASSO 3) AS FLOAT64 )
+--      a subquery inteira que a gente leu ali em cima, embrulhada
+--      num CAST. Aparece tres vezes: preco, condominio, iptu.
+--
+-- Duas funcoes novas, so:
+--   ARRAY_LENGTH(JSON_QUERY_ARRAY(listing, '$.amenities'))
+--     nao interessa QUAIS comodidades tem, interessa QUANTAS.
+--     Uma lista de tamanho variavel virou um numero — e numero
+--     e o que um modelo sabe usar.
+--   SUBSTR(JSON_VALUE(listing, '$.createdAt'), 1, 10)
+--     a data vem como "2024-03-15T14:22:01Z". Os 10 primeiros
+--     caracteres sao "2024-03-15", que o CAST AS DATE aceita.
+--
+-- E o CREATE OR REPLACE TABLE ... AS SELECT:
+--   pega o resultado do SELECT e MATERIALIZA como tabela nova.
+--   "OR REPLACE" = se ja existir, sobrescreve sem reclamar. E por
+--   isso que voce pode rodar este arquivo dez vezes seguidas.
+--
+-- Pergunta para a turma antes de seguir:
+--   por que praticamente todo CAST aqui e SAFE_CAST?
+--   (resposta: sao 1.000 anuncios preenchidos por gente diferente.
+--    Basta UM com area_util = "120 m2" para um CAST comum derrubar
+--    a criacao da tabela inteira. SAFE_CAST troca "quebrar tudo"
+--    por "essa celula vira NULL" — e NULL a gente trata depois)
+-- =====================================================================
 
 
 -- ---------------------------------------------------------------------
