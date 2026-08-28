@@ -447,7 +447,7 @@ ORDER BY attribution DESC;
 --
 --   "Treinar modelo no BigQuery e uma linha de SQL.
 --    O trabalho de verdade e tudo que veio ANTES do CREATE MODEL:
---    abrir o JSON, achar a fazenda do tamanho da Alemanha,
+--    abrir o JSON, achar a fazenda do tamanho de metade de Goiania,
 --    e desconfiar do modelo que acertou demais.
 --    Isso nenhuma ferramenta faz por voce."
 

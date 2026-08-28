@@ -159,7 +159,7 @@ WHERE preco IS NOT NULL;
 
 
 -- ---------------------------------------------------------------------
--- SUJEIRA 2 — A fazenda maior que a Alemanha
+-- SUJEIRA 2 — A fazenda do tamanho de metade de Goiânia
 -- ---------------------------------------------------------------------
 SELECT
   bairro,
@@ -172,14 +172,15 @@ ORDER BY area_util DESC
 LIMIT 10;
 
 -- O maior valor e 390.000.000 m2.
--- Isso e 390 mil km2 — maior que a Alemanha (357 mil km2).
+-- Isso e 390 km2 — mais da METADE do municipio de Goiania (~729 km2).
+-- Um imovel a venda ocupando metade da cidade onde ele esta anunciado.
 --
 -- Causa: mistura de unidade. Alguem preencheu em m2, outro em
 -- hectares, outro em alqueires, e o campo aceitou os tres.
 --
 -- LICAO:
 --   "Nenhum modelo vai te avisar que o numero e impossivel.
---    Quem sabe que uma fazenda nao tem o tamanho da Alemanha
+--    Quem sabe que uma fazenda nao ocupa metade de Goiania
 --    e voce, nao ele."
 
 SELECT
@@ -267,7 +268,7 @@ WHERE
 --     milhares e virou "R$ 850".
 --
 --   area_util BETWEEN 20 AND 10000
---     a fazenda do tamanho da Alemanha sai por aqui.
+--     a fazenda do tamanho de metade de Goiania sai por aqui.
 --
 --   cidade = 'Goiânia'
 --     999 de 1000 ja eram. Este filtro nao existe para limpar, e sim
