@@ -187,14 +187,14 @@ details.spoiler summary::after{
 }
 .pergunta .q{font-weight:600;color:var(--azul-escuro);margin:0 0 6px}
 
-/* ---------- intervalo ---------- */
-.intervalo{
+/* ---------- marco de meio de percurso ---------- */
+.marco{
   max-width:var(--largura);margin:40px auto;padding:20px 26px;
   background:var(--azul-escuro);color:#fff;border-radius:10px;
   display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;
 }
-.intervalo b{font-size:14px;letter-spacing:.22em}
-.intervalo span{color:#c7d2e2;font-size:16px;flex:1;min-width:220px}
+.marco b{font-size:14px;letter-spacing:.22em}
+.marco span{color:#c7d2e2;font-size:16px;flex:1;min-width:220px}
 
 /* ---------- mapa embutido (versao reduzida do diagrama) ---------- */
 .mapa{
@@ -240,7 +240,7 @@ body.projecao section>h2+p.tese{font-size:25px}
 body.projecao pre{font-size:19px;line-height:1.65}
 body.projecao table{font-size:20px}
 body.projecao .chave{font-size:26px}
-body.projecao .intervalo{max-width:1180px;font-size:22px}
+body.projecao .marco{max-width:1180px;font-size:22px}
 body.projecao .mapa .cx{font-size:18px;min-width:190px}
 body.projecao .mapa .cx i{font-size:15px}
 
@@ -260,8 +260,8 @@ body.projecao .mapa .cx i{font-size:15px}
   details:not([open])>.corpo{display:block}
   details summary::after{content:""}
   a{color:#000;text-decoration:none}
-  .intervalo{background:#fff;color:#000;border:2px solid #44546A;page-break-inside:avoid}
-  .intervalo span{color:#444}
+  .marco{background:#fff;color:#000;border:2px solid #44546A;page-break-inside:avoid}
+  .marco span{color:#444}
   .mapa{page-break-inside:avoid}
 }
 
@@ -332,8 +332,8 @@ body.projecao .mapa .cx i{font-size:15px}
   <div class="nota">
     <b>Quer ver o destino antes de sair?</b> O caminho inteiro de hoje — do bucket até os
     quatro modelos comparados — está desenhado em <a href="pipeline.html">pipeline.html</a>.
-    A gente volta nele depois do intervalo, quando cada caixa já tiver sido construída
-    por você.
+    Vale abrir agora para se localizar, e vale voltar nele mais tarde, quando cada caixa
+    já tiver sido construída por você.
   </div>
 
   <div class="alerta">
@@ -1293,10 +1293,11 @@ body.projecao .mapa .cx i{font-size:15px}
 </section>
 
 <!-- ============================================================ -->
-<div class="intervalo">
-  <b>INTERVALO</b>
-  <span>Na volta: o desenho de tudo que você construiu, o resto do cardápio do BQML,
-  e a conversa sobre os projetos de vocês.</span>
+<div class="marco">
+  <b>METADE DO CAMINHO</b>
+  <span>Até aqui você construiu o pipeline e treinou os modelos. Daqui em diante o
+  assunto muda: o desenho de tudo junto, o resto do cardápio do BQML, e os projetos
+  de vocês.</span>
 </div>
 
 <!-- ============================================================ -->
@@ -1304,7 +1305,7 @@ body.projecao .mapa .cx i{font-size:15px}
   <h2><span class="num">9</span>O pipeline inteiro, em uma tela</h2>
   <p class="tese">Agora que cada caixa foi construída por você, o desenho faz sentido.</p>
 
-  <p>Antes do intervalo você rodou sete scripts. Vistos de longe, eles são <b>um</b> caminho
+  <p>Até aqui foram sete scripts. Vistos de longe, eles são <b>um</b> caminho
   só — e cada bifurcação dele foi uma <b>decisão sua</b>, não do algoritmo:</p>
 
   <div class="mapa">

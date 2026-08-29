@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Do bucket ao modelo — o caminho inteiro da aula de 04/09",
+    "output": "aulas/04-09-bigquery-ml/material/pipeline.html",
+    "quality_profile": "showcase",
+    "viewBox": [1080, 760],
+    "animation": "trace",
+    "views": [
+      { "id": "etl", "label": "O caminho do dado", "focus": ["bucket", "bronze", "silver", "gold"], "note": "Do CSV cru no Cloud Storage ate a tabela limpa que serve de base para todos os modelos." },
+      { "id": "alavancas", "label": "As tres alavancas", "focus": ["v0", "v1", "v3", "v4"], "note": "Limpar o dado, criar feature de texto e trocar o algoritmo. Nessa ordem de ganho." },
+      { "id": "armadilha", "label": "O vazamento", "focus": ["goldtexto", "v3", "v2"], "note": "A mesma coluna e a mesma funcao do BigQuery produzem uma feature legitima e uma fraude." }
+    ]
+  },
+  "stages": [
+    { "label": "Origem" },
+    { "label": "Bronze e silver" },
+    { "label": "Gold" },
+    { "label": "Modelos de preco" },
+    { "label": "Melhoria e outros alvos" }
+  ],
+  "nodes": [
+    { "id": "bucket", "type": "cloud", "label": "Cloud Storage", "sublabel": "aula-pdm.csv", "stage": 0, "row": 2, "tag": "1.000 linhas" },
+    { "id": "bronze", "type": "database", "label": "bronze", "sublabel": "tabela externa", "stage": 1, "row": 1, "tag": "script 01" },
+    { "id": "silver", "type": "database", "label": "silver", "sublabel": "1.000 anuncios", "stage": 1, "row": 3, "tag": "com outliers" },
+    { "id": "gold28", "type": "database", "label": "gold de 28/08", "sublabel": "sem limpeza", "stage": 2, "row": 0, "tag": "aula anterior" },
+    { "id": "gold", "type": "database", "label": "anuncios_gold", "sublabel": "887 linhas", "stage": 2, "row": 2, "tag": "script 02" },
+    { "id": "goldtexto", "type": "database", "label": "gold_texto", "sublabel": "gold + 6 flags", "stage": 2, "row": 3, "tag": "script 05" },
+    { "id": "v0", "type": "security", "label": "modelo v0", "sublabel": "erra 13,8 mi", "stage": 3, "row": 0, "tag": "R2 -0,350" },
+    { "id": "v1", "type": "backend", "label": "modelo v1", "sublabel": "erra 2,58 mi", "stage": 3, "row": 2, "tag": "R2 +0,298" },
+    { "id": "v3", "type": "backend", "label": "modelo v3", "sublabel": "erra 2,47 mi", "stage": 3, "row": 3, "tag": "R2 +0,471" },
+    { "id": "v2", "type": "security", "label": "modelo v2", "sublabel": "le o preco", "stage": 3, "row": 4, "tag": "NAO FACA" },
+    { "id": "comercial", "type": "backend", "label": "modelo_comercial", "sublabel": "residencial?", "stage": 4, "row": 1, "tag": "acerta 95,3%" },
+    { "id": "v4", "type": "backend", "label": "modelo v4", "sublabel": "erra 1,82 mi", "stage": 4, "row": 3, "tag": "R2 +0,556" },
+    { "id": "kmeans", "type": "backend", "label": "segmentos_imoveis", "sublabel": "4 grupos", "stage": 4, "row": 4, "tag": "KMEANS" }
+  ],
+  "flows": [
+    { "id": "f-carga", "from": "bucket", "to": "bronze", "label": "CSV", "classification": "tabela externa", "variant": "default", "fromSide": "right", "toSide": "left", "route": "vertical-channel", "channelX": 207, "labelAt": [207, 330] },
+    { "id": "f-tipagem", "from": "bronze", "to": "silver", "label": "tipagem", "classification": "script 01", "variant": "default", "fromSide": "bottom", "toSide": "top", "route": "straight", "labelAt": [315, 390] },
+    { "id": "f-sem-limpeza", "from": "silver", "to": "gold28", "label": "sem limpar", "classification": "como estava", "variant": "dashed", "fromSide": "right", "toSide": "left", "route": "vertical-channel", "channelX": 400, "labelAt": [410, 250] },
+    { "id": "f-limpeza", "from": "silver", "to": "gold", "label": "corta outliers", "classification": "decisao 1", "variant": "emphasis", "fromSide": "right", "toSide": "left", "route": "vertical-channel", "channelX": 447, "labelAt": [447, 340] },
+    { "id": "f-feature", "from": "gold", "to": "goldtexto", "label": "REGEXP", "classification": "decisao 2", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "route": "straight", "labelAt": [530, 442] },
+    { "id": "f-v0", "from": "gold28", "to": "v0", "label": "LINEAR_REG", "classification": "pior que a media", "variant": "dashed", "fromSide": "right", "toSide": "left", "route": "straight", "labelAt": [637, 130] },
+    { "id": "f-v1", "from": "gold", "to": "v1", "label": "LINEAR_REG", "classification": "dado limpo", "variant": "default", "fromSide": "right", "toSide": "left", "route": "straight", "labelAt": [637, 358] },
+    { "id": "f-v3", "from": "goldtexto", "to": "v3", "label": "LINEAR_REG", "classification": "mais colunas", "variant": "default", "fromSide": "right", "toSide": "left", "route": "straight", "labelAt": [637, 472] },
+    { "id": "f-vazamento", "from": "goldtexto", "to": "v2", "label": "preco no titulo", "classification": "vazamento", "variant": "security", "fromSide": "right", "toSide": "left", "route": "vertical-channel", "channelX": 640, "labelAt": [640, 560] },
+    { "id": "f-v4", "from": "v3", "to": "v4", "label": "BOOSTED_TREE", "classification": "decisao 3", "variant": "emphasis", "fromSide": "right", "toSide": "left", "route": "straight", "labelAt": [852, 472] },
+    { "id": "f-comercial", "from": "gold", "to": "comercial", "label": "LOGISTIC_REG", "classification": "outro alvo", "variant": "default", "fromSide": "top", "toSide": "top", "route": "top-channel", "channelY": 218, "labelAt": [790, 205] },
+    { "id": "f-kmeans", "from": "goldtexto", "to": "kmeans", "label": "KMEANS", "classification": "sem gabarito", "variant": "default", "fromSide": "bottom", "toSide": "bottom", "route": "bottom-channel", "channelY": 668, "labelAt": [780, 690] }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "As tres alavancas, em ordem de ganho",
+      "items": [
+        "Limpar o dado (v0 para v1) derrubou o erro 5,4 vezes",
+        "Criar feature de texto (v1 para v3) levou o R2 de 0,298 para 0,471",
+        "Trocar o algoritmo (v3 para v4) cortou mais 26% do erro",
+        "A alavanca que menos parece ML foi a que mais pagou"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Uma tabela, varios alvos",
+      "items": [
+        "gold_texto alimenta regressao, arvore e KMEANS sem copiar o dado",
+        "Trocar de familia de modelo e trocar a string do model_type",
+        "O KMEANS reconstruiu o tipo de imovel que a silver tinha perdido"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "A mesma coluna, dois destinos",
+      "items": [
+        "As flags do v3 e o preco do v2 saem ambos da coluna titulo, com REGEXP",
+        "Uma e engenharia de feature, a outra e vazamento de alvo",
+        "A pergunta que separa as duas: essa informacao existiria no momento da predicao?"
+      ]
+    }
+  ]
+}

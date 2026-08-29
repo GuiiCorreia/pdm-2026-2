@@ -71,6 +71,24 @@ Os arquivos em `sql/_arquivo/` são a versão anterior do material (pré-28/08).
 
 ---
 
+## Os notebooks (extra)
+
+A aula acontece no console do BigQuery. Os notebooks em [`notebooks/`](notebooks/) são a mesma aula rodando de Python, para quando você for estudar sozinho:
+
+| # | Notebook | Cobre |
+|---|---|---|
+| 1 | [`01-do-bucket-a-gold.ipynb`](notebooks/01-do-bucket-a-gold.ipynb) | scripts 1 e 2 |
+| 2 | [`02-modelos-e-features.ipynb`](notebooks/02-modelos-e-features.ipynb) | scripts 0, 3, 4 e 5 |
+| 3 | [`03-armadilha-e-modelos-prontos.ipynb`](notebooks/03-armadilha-e-modelos-prontos.ipynb) | scripts 6 e 7 |
+
+O SQL é o mesmo, palavra por palavra. O que muda é que o resultado volta como DataFrame e dá para desenhar o placar em gráfico, em vez de olhar número solto.
+
+Rodam no Colab sem instalar nada. Localmente, precisam de `google-cloud-bigquery`, `pandas`, `db-dtypes` e `matplotlib`. A primeira célula é a única que você edita: troque `SEU_PROJETO` pelo id do seu projeto.
+
+Não são pré-requisito da aula. Se você só quer o Trabalho 1, o `sql/` basta.
+
+---
+
 ## O placar que a aula constrói
 
 Tudo que a gente faz hoje cabe nesta tabela. Ela é o resumo da disciplina inteira:
