@@ -228,7 +228,7 @@ Um node **Edit Fields (Set)** no topo do fluxo, chamado `Config`, com a configur
 ```
 projeto  = pdm-2026-2
 dataset  = imoveis
-bucket   = pdm-2026-2-dados
+bucket   = pdm-2026-gui
 ```
 
 E daí para a frente, no fluxo inteiro:

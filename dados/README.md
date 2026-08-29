@@ -7,13 +7,13 @@ Anúncios reais de imóveis, coletados do GrupoZAP/VivaReal. **999 dos 1.000 an�
 O arquivo completo **não está neste repositório**. Ele mora num bucket público do Cloud Storage:
 
 ```
-gs://pdm-2026-2-dados/imoveis/aula-pdm.csv
+gs://pdm-2026-gui/imoveis/aula-pdm.csv
 ```
 
 Para baixar, ou só espiar no navegador:
 
 ```
-https://storage.googleapis.com/pdm-2026-2-dados/imoveis/aula-pdm.csv
+https://storage.googleapis.com/pdm-2026-gui/imoveis/aula-pdm.csv
 ```
 
 É leitura pública: não precisa de conta, de chave nem de permissão. **E você não precisa baixar** — o BigQuery lê direto do bucket, que é exatamente o que os scripts da aula fazem.
@@ -24,7 +24,7 @@ https://storage.googleapis.com/pdm-2026-2-dados/imoveis/aula-pdm.csv
 | Linhas | 1.000 | 100 |
 | Tamanho | 14,6 MB | 1,3 MB |
 | Colunas | 4 | 4 |
-| Região | `us-east1` | — |
+| Região | `us-central1` | — |
 
 ## Sobre a amostra
 
@@ -125,7 +125,7 @@ Tem um perfilador em [`../ferramentas/perfilar_dataset.py`](../ferramentas/perfi
 python3 ferramentas/perfilar_dataset.py dados/amostra-100.csv
 
 # ou no arquivo completo, depois de baixar do bucket
-curl -O https://storage.googleapis.com/pdm-2026-2-dados/imoveis/aula-pdm.csv
+curl -O https://storage.googleapis.com/pdm-2026-gui/imoveis/aula-pdm.csv
 python3 ferramentas/perfilar_dataset.py aula-pdm.csv
 ```
 

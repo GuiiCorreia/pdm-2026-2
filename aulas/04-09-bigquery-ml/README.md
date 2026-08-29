@@ -1,39 +1,34 @@
 # 04/09 — BigQuery ML
 
-> Do JSON cru até um modelo treinado, sem sair do SQL.
+> Na aula passada você treinou um modelo. Hoje a gente descobre se ele presta.
 
-Hoje a gente fecha o caminho que começou na aula de Medallion: você já sabe **guardar** o dado. Falta fazer ele **decidir** alguma coisa.
+Com o Sávio você fez `raw → bronze → silver` e rodou um `CREATE MODEL` em cima de uma gold. Apareceu **"o modelo foi criado"** e a aula acabou ali.
 
-No fim da aula você vai ter, na sua conta, treinado por você:
-- uma camada Silver construída a partir de um JSON aninhado de verdade
-- um modelo de **regressão** que estima o preço de um imóvel
-- um modelo de **classificação** que diz se um anúncio é residencial ou comercial
-- e uma resposta para a pergunta que vale mais que os dois modelos juntos: *como eu sei se posso confiar nisso?*
+Ficou uma pergunta no ar: **o modelo é bom?**
+
+A aula de hoje começa respondendo isso — em uma query — e a resposta é ruim. A partir daí, o trabalho todo é consertar. No fim você vai ter, na sua conta, treinados por você:
+
+- um diagnóstico honesto do modelo de 28/08 (spoiler: R² **negativo**)
+- uma camada **Gold** construída com critério, não com sorte
+- **features de texto** arrancadas do título do anúncio com NLP simples
+- **quatro modelos de preço** comparados num placar só
+- um modelo de **classificação** (comercial vs residencial) medido contra baseline
+- uma **segmentação de mercado** sem label nenhum (KMeans)
+- e a armadilha que faz um modelo parecer ótimo e ser inútil
 
 ---
 
 ## Antes de começar
 
 - [ ] Ambiente montado conforme [`../../docs/01-monte-seu-ambiente-gcp.md`](../../docs/01-monte-seu-ambiente-gcp.md)
-- [ ] Dataset criado no BigQuery, **em `us-east1`**
+- [ ] Você tem o dataset **`anuncios`** com a tabela `tb_anuncios_silver` (feita na aula do Sávio)
 - [ ] Você deu uma olhada no [dicionário de dados](../../dados/README.md)
 
-Você **não precisa subir o `.csv`**. O dado da disciplina já está num bucket público:
+**Não terminou a aula passada?** Sem problema. O `sql/00_avaliar_modelo_de_hoje.sql` tem, comentado no topo, o `CREATE MODEL` exato do Sávio. Descomente, rode, e você entra na aula no mesmo ponto que a turma.
 
-```
-gs://pdm-2026-2-dados/imoveis/aula-pdm.csv
-```
+**Um placeholder só.** Todos os scripts usam `SEU_PROJETO`. Troque pelo id do seu projeto no GCP, em todos os arquivos, antes de rodar qualquer coisa. O dataset é `anuncios` e já vem escrito.
 
-Ele está em `us-east1` — por isso o seu dataset também tem que estar. Bucket e dataset em regiões diferentes: o BigQuery se recusa a ler.
-
-**Todos os scripts usam dois placeholders.** Antes de rodar qualquer coisa, troque nos seis arquivos:
-
-| Placeholder | Troque por |
-|---|---|
-| `SEU_PROJETO` | o id do seu projeto no GCP |
-| `SEU_DATASET` | o nome do dataset que você criou no BigQuery (`pdm_2026_2`) |
-
-No editor, é um "substituir em todos os arquivos". Se esquecer, o BigQuery vai reclamar de tabela não encontrada e você vai perder cinco minutos procurando o motivo errado.
+No editor é um "substituir em todos os arquivos". Se esquecer, o BigQuery reclama de tabela não encontrada e você perde cinco minutos procurando o motivo errado.
 
 ---
 
@@ -41,12 +36,15 @@ No editor, é um "substituir em todos os arquivos". Se esquecer, o BigQuery vai 
 
 O material completo da aula está em **[`material/aula-04-09.html`](material/aula-04-09.html)**.
 
-Abra com dois cliques. Ele funciona offline, não precisa de internet nem de instalar nada.
+Abra com dois cliques. Funciona offline, não precisa de internet nem de instalar nada. É por ele que a gente vai na aula, alternando com o console do BigQuery.
 
 - botão de **copiar** em cada bloco de SQL
 - **checkpoints** que ficam marcados enquanto você avança
-- **Ctrl+P / Cmd+P** gera um PDF, se você preferir estudar impresso
+- **spoilers**: tenta responder antes de clicar
+- **Ctrl+P / Cmd+P** gera um PDF, se preferir estudar impresso
 - tecla **P** liga o modo de projeção
+
+O diagrama do pipeline inteiro está em **[`material/pipeline.html`](material/pipeline.html)** — a mesma coisa, em uma tela.
 
 Ele é o seu guia de estudo depois da aula também. Não é slide.
 
@@ -58,14 +56,39 @@ Rode nesta ordem. Cada um depende do anterior.
 
 | # | Arquivo | O que ele faz |
 |---|---|---|
-| 0 | [`sql/bronze_00_setup.sql`](sql/bronze_00_setup.sql) | aponta o BigQuery para o CSV no seu bucket, sem copiar o arquivo |
-| 1 | [`sql/silver_01_json.sql`](sql/silver_01_json.sql) | quebra o JSON aninhado em colunas |
-| 2 | [`sql/silver_02_etl.sql`](sql/silver_02_etl.sql) | olha para o dado antes de confiar nele, e limpa |
-| 3 | [`sql/ml_03_regressao.sql`](sql/ml_03_regressao.sql) | treina, avalia, prevê e explica um modelo de regressão |
-| 4 | [`sql/ml_04_classificacao.sql`](sql/ml_04_classificacao.sql) | o mesmo caminho, trocando uma palavra |
-| 5 | [`sql/ml_05_armadilha.sql`](sql/ml_05_armadilha.sql) | melhora o modelo do passo 3 e investiga o resultado |
+| 0 | [`sql/00_avaliar_modelo_de_hoje.sql`](sql/00_avaliar_modelo_de_hoje.sql) | julga o modelo que você treinou em 28/08. Uma query |
+| 1 | [`sql/01_silver_mente.sql`](sql/01_silver_mente.sql) | prova que "silver" não quer dizer "limpo" |
+| 2 | [`sql/02_gold_etl.sql`](sql/02_gold_etl.sql) | constrói a Gold de verdade, decidindo o que entra e o que sai |
+| 3 | [`sql/03_regressao.sql`](sql/03_regressao.sql) | retreina o preço na Gold e compara com o modelo velho |
+| 4 | [`sql/04_classificacao.sql`](sql/04_classificacao.sql) | comercial ou residencial: outro problema, mesmos três verbos |
+| 5 | [`sql/05_features_texto.sql`](sql/05_features_texto.sql) | tira feature do título do anúncio (piscina, alto padrão, terreno) |
+| 6 | [`sql/06_armadilha.sql`](sql/06_armadilha.sql) | o modelo que melhora e mesmo assim está errado |
+| 7 | [`sql/07_modelos_prontos.sql`](sql/07_modelos_prontos.sql) | árvore no lugar da reta, e um KMeans sem label nenhum |
 
-> Sobre o passo 5: **rode antes de tirar conclusão.** Ele não é o que parece na primeira leitura.
+> Sobre o passo 6: **rode antes de tirar conclusão.** Ele não é o que parece na primeira leitura.
+
+Os arquivos em `sql/_arquivo/` são a versão anterior do material (pré-28/08). Estão ali só como histórico — não rode.
+
+---
+
+## O placar que a aula constrói
+
+Tudo que a gente faz hoje cabe nesta tabela. Ela é o resumo da disciplina inteira:
+
+| modelo | o que mudou | MAE | R² |
+|---|---|---:|---:|
+| v0 | o dado como estava | R$ 13.835.427 | **−0,350** |
+| v1 | Gold limpa | R$ 2.581.138 | +0,298 |
+| v3 | Gold + features de texto | R$ 2.469.775 | +0,471 |
+| v4 | mesmo dado, árvore no lugar da reta | R$ 1.823.401 | **+0,556** |
+
+Três alavancas, nesta ordem de impacto:
+
+1. **limpar o dado** (v0 → v1) — o erro caiu 5,4×
+2. **criar feature** (v1 → v3) — o R² subiu de 0,298 para 0,471
+3. **trocar o algoritmo** (v3 → v4) — o erro caiu mais 26%
+
+Todo mundo aposta na terceira. É a primeira que decide o jogo, e é a que ninguém quer fazer.
 
 ---
 
@@ -74,14 +97,12 @@ Rode nesta ordem. Cada um depende do anterior.
 Nos comandos mais densos, logo **depois** do SQL, tem um bloco assim:
 
 ```
--- =====================================================================
+-- ---------------------------------------------------------------------
 -- COMO LER ESTE COMANDO
--- =====================================================================
+-- ---------------------------------------------------------------------
 ```
 
 Ele destrincha a query pedaço por pedaço: o que cada função faz, por que ela está ali, e o que quebra se você tirar. Quase sempre a leitura é **de dentro para fora**, começando pelo miolo.
-
-Cada bloco termina com uma **pergunta**, com a resposta logo abaixo entre parênteses. Vale mais tentar responder antes de ler.
 
 Copiar SQL que funciona é fácil. O que faz diferença no Trabalho 1 é conseguir olhar para uma query de outra pessoa e dizer o que ela faz — e é para isso que esses blocos existem.
 
@@ -91,7 +112,7 @@ Nem todo comando tem um. Os de conferência (`SELECT COUNT(*)`) não precisam.
 
 ## Os três verbos
 
-A aula inteira cabe em três comandos. Repare que você já conhece o primeiro verbo:
+A aula inteira cabe em três comandos. E você já conhece o primeiro:
 
 ```sql
 CREATE MODEL   ...   OPTIONS (model_type = '...')   AS SELECT ...
@@ -101,24 +122,35 @@ ML.PREDICT     (MODEL ..., (SELECT ...))
 
 `CREATE TABLE` você já sabe. `CREATE MODEL` é o mesmo verbo, com um `OPTIONS` no meio. Não existe `pip install`, não existe `train_test_split`, não existe notebook. O modelo vira um objeto do dataset, do lado das suas tabelas.
 
+Mais dois que aparecem hoje:
+
+```sql
+ML.GLOBAL_EXPLAIN    (MODEL ...)   -- quais colunas o modelo usou
+ML.CONFUSION_MATRIX  (MODEL ...)   -- onde a classificação erra
+```
+
 ---
 
 ## Custo
 
 Zero.
 
-O dataset tem 14,6 MB. O free tier do BigQuery cobre 1 TiB de query processada por mês. Você teria que rodar os scripts desta aula dezenas de milhares de vezes para chegar perto do limite. Treinar modelo com `CREATE MODEL` também entra nessa conta.
+O dataset tem 14,6 MB. O free tier do BigQuery cobre 1 TiB de query processada por mês, e o `CREATE MODEL` entra na mesma conta. Você teria que rodar os scripts desta aula dezenas de milhares de vezes para chegar perto do limite.
 
 ---
 
 ## Onde isso te leva
 
-O **Trabalho 1** pede para treinar um modelo a partir da camada Gold usando **puramente BigQuery ML**. Os passos 3 e 4 são exatamente o esqueleto disso.
+O **Trabalho 1** pede um modelo treinado a partir da camada Gold usando **puramente BigQuery ML**. Os scripts 2, 3 e 4 são o esqueleto disso.
 
-O passo 5 é o que separa um trabalho que roda de um trabalho que está certo. Vale a pena reler antes de entregar.
+O script 6 é o que separa um trabalho que roda de um trabalho que está certo. Vale reler antes de entregar.
+
+E o script 5 é o que separa um trabalho correto de um trabalho interessante: qualquer um treina no que já está tabelado; poucos param para perguntar o que mais tem escondido no texto.
 
 ---
 
 ## Desafios
 
-Cada script termina com desafios. Eles não valem nota, mas são o que você vai querer ter feito quando o trabalho chegar. Se for fazer só um, faça o de trocar `LINEAR_REG` por `BOOSTED_TREE_REGRESSOR` e comparar as métricas: é uma linha de diferença e o resultado costuma surpreender.
+Cada script termina com desafios. Não valem nota, mas são exatamente o que você vai querer ter feito quando o trabalho chegar.
+
+Se for fazer só um: no script 7, treine a árvore **sem** as features de texto e descubra quanto do ganho veio do algoritmo e quanto veio da feature. Essa é a pergunta que separa relatório bom de relatório ruim.

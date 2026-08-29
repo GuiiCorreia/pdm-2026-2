@@ -270,7 +270,7 @@ def main(caminho):
 
     print("\n" + "=" * 70)
     print("PROXIMO PASSO: usar este relatorio para fixar os alvos dos scripts")
-    print("01_regressao.sql, 02_classificacao.sql, 03_previsao, 04_nlp e 05_armadilha")
+    print("de aulas/04-09-bigquery-ml/sql/ (00 a 07)")
     print("=" * 70 + "\n")
 
 
