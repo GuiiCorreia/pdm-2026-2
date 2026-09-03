@@ -10,8 +10,12 @@
 --
 -- A tese deste script (e da aula):
 --
---     SILVER NAO QUER DIZER LIMPO. QUER DIZER ESTRUTURADO.
---     Tipar a coluna nao conserta o valor que esta dentro dela.
+--     PELO LIVRO, LIMPAR E DEVER DA SILVER. A NOSSA CHEGOU DEVENDO.
+--
+--     Na arquitetura medalhao de referencia, a limpeza (nulos,
+--     outliers, duplicatas) acontece na passagem bronze -> silver.
+--     A nossa silver esta estruturada, 23 colunas tipadas — mas
+--     tipar a coluna nao conserta o valor que esta dentro dela.
 --
 -- COMO USAR: troque SEU_PROJETO pelo id do seu projeto GCP.
 -- O dataset criado nos notebooks do Savio chama `anuncios`.
@@ -233,8 +237,10 @@ LIMIT 10;
 --   2. Area:   uma "fazenda" de 63% de Goiania, 83 areas impossiveis.
 --   3. Schema: 3 colunas mortas + coordenadas trocadas e faltando.
 --
---   "SILVER NAO QUER DIZER LIMPO. QUER DIZER ESTRUTURADO.
---    O proximo script constroi a tabela em que da para confiar."
+--   "PELO LIVRO, ESSA LIMPEZA ERA DEVER DA SILVER. A NOSSA CHEGOU
+--    DEVENDO — e dado que passa sujo por uma camada nao se conserta
+--    sozinho na seguinte. O proximo script paga a divida e constroi
+--    a tabela em que da para confiar."
 
 
 -- ---------------------------------------------------------------------

@@ -57,7 +57,7 @@ Rode nesta ordem. Cada um depende do anterior.
 | # | Arquivo | O que ele faz |
 |---|---|---|
 | 0 | [`sql/00_avaliar_modelo_de_hoje.sql`](sql/00_avaliar_modelo_de_hoje.sql) | julga o modelo que você treinou em 28/08. Uma query |
-| 1 | [`sql/01_silver_mente.sql`](sql/01_silver_mente.sql) | prova que "silver" não quer dizer "limpo" |
+| 1 | [`sql/01_silver_mente.sql`](sql/01_silver_mente.sql) | mostra a dívida de ETL da silver (pelo livro, limpar era dever dela) |
 | 2 | [`sql/02_gold_etl.sql`](sql/02_gold_etl.sql) | constrói a Gold de verdade, decidindo o que entra e o que sai |
 | 3 | [`sql/03_regressao.sql`](sql/03_regressao.sql) | retreina o preço na Gold e compara com o modelo velho |
 | 4 | [`sql/04_classificacao.sql`](sql/04_classificacao.sql) | comercial ou residencial: outro problema, mesmos três verbos |
