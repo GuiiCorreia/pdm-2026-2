@@ -73,6 +73,11 @@ ORDER BY anuncios DESC;
 --   apartamento 101 anuncios   mediana R$  8.015.000   R$ 18.000/m2
 --   terreno      91 anuncios   mediana R$ 10.780.000   R$  4.001/m2
 --
+-- A query devolve 7 linhas, nao 4. As quatro acima sao as categorias
+-- PURAS e somam 856. Os outros 31 anuncios casam com mais de uma regra
+-- ao mesmo tempo: casa+terreno (28), apto+casa (2), apto+terreno (1).
+-- E disso que trata o desafio 3 la embaixo.
+--
 -- ESTE e o numero da aula:
 --
 --   Pelo PRECO, terreno e o mais caro dos quatro (R$ 10,7 mi).

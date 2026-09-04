@@ -76,8 +76,9 @@ FROM `SEU_PROJETO.anuncios.gold_com_titulo`;
 --
 -- Dos 36 titulos com valor parseavel, 33 batem com o preco real.
 -- Guarde esse numero: ele explica o que acontece no passo 4.
--- (Entre os que nao batem: "R$13 Milhões" — a regex le "13". O texto
---  ate quando entrega, entrega mentindo. Guarde para o final.)
+-- (Os 3 que nao batem erram cada um de um jeito: um vira 0, outro
+--  vira 13, outro vira 88. O texto, ate quando entrega, entrega
+--  mentindo. Guarde para o final.)
 
 
 -- ---------------------------------------------------------------------
@@ -171,10 +172,14 @@ GROUP BY 1;
 --    em qualquer lugar. Se tivesse preco, voce nao precisaria do
 --    modelo. O v2 e otimo em prever o passado."
 --
--- E o detalhe cruel dos 3 que nao batiam: "R$13 Milhões" virou 13.
--- A feature vazada, alem de vazada, MENTE de vez em quando — o
--- anuncio de R$ 13,9 mi ganhou um "preco" de R$ 13,00. O modelo
--- engole os dois com a mesma confianca.
+-- E o detalhe cruel: os 3 que nao batiam erram de TRES jeitos
+-- diferentes, o que e pior do que errar de um jeito so.
+--   titulo com "R$ .00"          -> a regex le 0     (preco real 22,0 mi)
+--   "Residencia de R$13 Milhoes" -> a regex le 13    (preco real 13,9 mi)
+--   sobrado no Alphaville Ipes   -> a regex le 88    (preco real  8,8 mi)
+-- A feature vazada, alem de vazada, MENTE de vez em quando — e mente
+-- de um jeito diferente a cada linha. O modelo engole tudo com a
+-- mesma confianca.
 
 
 -- ---------------------------------------------------------------------

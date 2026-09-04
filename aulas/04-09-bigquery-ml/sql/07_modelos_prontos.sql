@@ -106,15 +106,23 @@ ORDER BY r2_score;
 --   v0_dado_como_estava   13.835.427       -0,350
 --   v1_gold_limpa          2.581.138       +0,298
 --   v3_gold_mais_texto     2.469.775       +0,471
---   v4_arvore_mesmo_dado   1.823.401       +0,556
+--   v4_arvore_mesmo_dado   1,8 a 2,2 mi    +0,55 a +0,65
+--
+--   ATENCAO — so a linha do v4 muda de um treino pro outro. O
+--   BOOSTED_TREE tem aleatoriedade no treino, entao o seu numero vai
+--   cair dentro dessa faixa, nao em cima de um valor exato. Dois runs
+--   medidos deram 1.823.401 / +0,556 e 2.165.238 / +0,652.
+--   Ja o v0, v1 e v3 sao LINEAR_REG com AUTO_SPLIT: reproduzem digito
+--   por digito, e e por eles que voce confere o pipeline.
 --
 --   A conta das tres alavancas, do inicio ao fim:
 --     limpar o dado   (v0 -> v1)  o erro caiu 5,4x
 --     criar feature   (v1 -> v3)  o R2 subiu de 0,298 pra 0,471
---     trocar modelo   (v3 -> v4)  o erro caiu mais 26%
+--     trocar modelo   (v3 -> v4)  o erro caiu mais 10 a 25%
 --
 --   Comeco: erra R$ 13,8 milhoes e e PIOR que chutar a media.
---   Fim:    erra R$ 1,8 milhao e explica 56% da variacao do preco.
+--   Fim:    erra por volta de R$ 2 milhoes e explica algo perto de
+--           60% da variacao do preco.
 --
 -- Para pensar: qual das tres alavancas deu o maior ganho?
 --  A aposta natural e a troca de modelo, porque e a que parece "de
@@ -149,12 +157,18 @@ ORDER BY attribution DESC;
 --   tem_piscina     1.128.073      suites           434.656
 --   eh_casa         1.127.408      bairro           411.132
 --   ...                            ...
---   area_util         334.058      tem_piscina            0
+--   area_util         334.058      uma flag de texto      0
+--
+--   A coluna da ESQUERDA (v3, linear) reproduz igual no seu projeto.
+--   A da DIREITA vem de UM treino da arvore: a ordem do topo se mantem
+--   (area_util na frente, garagem em segundo, flags de texto no fim),
+--   mas os valores e QUAL flag zera mudam a cada treino.
 --
 --   Leia isso com calma, porque e contraintuitivo:
 --
 --   No LINEAR, as flags de texto estao no topo e a area_util no fim.
---   Na ARVORE, a area_util domina e a piscina vale ZERO.
+--   Na ARVORE, a area_util domina e as flags de texto desabam pro fim
+--   da lista — alguma delas chega a valer ZERO.
 --
 --   As duas leituras estao certas. Elas nao respondem "o que decide o
 --   preco de um imovel no mundo real" — respondem "o que ESTE modelo

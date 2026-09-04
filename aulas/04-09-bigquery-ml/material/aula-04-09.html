@@ -323,6 +323,13 @@ body.projecao .mapa .cx i{font-size:15px}
     gold e a dívida de limpeza que esta base carrega.
   </div>
 
+  <p style="text-align:center;margin:22px 0 6px">
+    <a href="medallion.html" class="botao-link">Abrir o diagrama da arquitetura medalhão &rarr;</a>
+  </p>
+  <p style="text-align:center;font-size:14px;color:#7d8b9c;margin-top:0">
+    bronze, silver e gold em uma tela — é por onde a aula começa
+  </p>
+
   <div class="chave">
     O <code>modelo_preco_imoveis</code> que está no seu projeto... <b>é bom?</b><br>
     O material começa respondendo isso, em uma query.
@@ -382,6 +389,13 @@ body.projecao .mapa .cx i{font-size:15px}
   <div class="bloco">
     <header><span>a linha de verdade</span><button onclick="copiar(this)">copiar</button></header>
 <pre><span class="k">SELECT</span> * <span class="k">FROM</span> <span class="f">ML.EVALUATE</span>(<span class="k">MODEL</span> `SEU_PROJETO.anuncios.modelo_preco_imoveis`);</pre>
+  </div>
+
+  <div class="nota">
+    <b>Leia o resultado na aba <code>JSON</code>, não na <code>Resultados</code>.</b> A aba
+    Resultados trunca os números longos (<code>2581138.334933…</code>) e você não consegue
+    comparar com os valores de referência deste material. A aba JSON, ao lado, mostra o valor
+    inteiro. Isso vale para <b>todo</b> <code>ML.EVALUATE</code> daqui em diante.
   </div>
 
   <p>As duas colunas que importam hoje:</p>
@@ -898,6 +912,13 @@ body.projecao .mapa .cx i{font-size:15px}
 <span class="k">FROM</span> `SEU_PROJETO.anuncios.anuncios_gold`;</pre>
   </div>
 
+  <div class="alerta">
+    <b>Este treino demora — conte uns 3 a 4 minutos.</b> É o mais lento do material, bem mais
+    que os <code>LINEAR_REG</code> (uns 25 s cada). O motivo é o <code>bairro</code>: uma
+    coluna categórica com muitos valores distintos custa caro na regressão logística. Dispare
+    e vá lendo a próxima seção enquanto roda.
+  </div>
+
   <div class="nota">
     <b>Label e feature são papéis, não propriedades da coluna.</b> O <code>preco</code> que
     era resposta no bloco 5 é pergunta neste.
@@ -1063,6 +1084,10 @@ body.projecao .mapa .cx i{font-size:15px}
         <tr><td>apartamento</td><td>101</td><td>R$ 8.015.000</td><td><b>R$ 18.000</b></td></tr>
         <tr><td>terreno</td><td>91</td><td><b>R$ 10.780.000</b></td><td><b>R$ 4.001</b></td></tr>
       </table>
+      <p style="font-size:14px;color:#7d8b9c">A query devolve <b>7 linhas</b>, não 4: as quatro
+      acima são as categorias <i>puras</i> e somam 856. Os outros 31 anúncios casam com mais de
+      uma regra ao mesmo tempo — <code>casa+terreno</code> (28), <code>apto+casa</code> (2) e
+      <code>apto+terreno</code> (1). Isso é o assunto do desafio 3 deste bloco.</p>
       <p>Pelo <b>preço</b>, terreno é o mais caro dos quatro. Pelo <b>preço por m²</b>, terreno
       custa R$ 4.001 e apartamento R$ 18.000 — <b>quatro vezes mais</b>.</p>
       <div class="chave">
@@ -1212,6 +1237,12 @@ body.projecao .mapa .cx i{font-size:15px}
   <h3>Passo 1 — minerar o título de novo</h3>
   <p>Alguns anunciantes escrevem o valor no próprio título:</p>
 
+  <div class="alerta">
+    <b>Use o botão <code>copiar</code> nas queries deste bloco.</b> As regex daqui têm
+    <code>\$</code> escapado, e o editor do BigQuery embaralha as aspas quando o texto é
+    digitado à mão — a query sai truncada e o erro é difícil de enxergar.
+  </div>
+
   <div class="bloco">
     <header><span>REGEXP_EXTRACT — a "feature nova"</span><button onclick="copiar(this)">copiar</button></header>
 <pre><span class="k">SELECT</span>
@@ -1287,9 +1318,11 @@ body.projecao .mapa .cx i{font-size:15px}
       importante: vazamento <b>não precisa melhorar a métrica agregada para ser fatal</b>.
       Em produção, todo imóvel novo chega <i>sem</i> preço — no título ou em qualquer lugar.
       Se tivesse preço, você não precisaria do modelo.</p>
-      <p>Detalhe cruel: nos 3 títulos em que o valor não batia, a regex leu
-      <i>"R$13 Milhões"</i> como <b>13</b>. A feature vazada, além de vazada, <b>mente</b>
-      de vez em quando — e o modelo engole os dois com a mesma confiança.</p>
+      <p>Detalhe cruel: os 3 títulos em que o valor não bate erram de <b>três jeitos
+      diferentes</b> — um preço de R$ 22 mi cujo título traz <i>"R$ .00"</i> vira
+      <b>0</b>; <i>"Residência de R$13 Milhões"</i> (preço real R$ 13,9 mi) vira <b>13</b>;
+      e um sobrado de R$ 8,8 mi vira <b>88</b>. A feature vazada, além de vazada,
+      <b>mente</b> de vez em quando — e o modelo engole tudo com a mesma confiança.</p>
     </div>
   </details>
 
@@ -1368,7 +1401,7 @@ body.projecao .mapa .cx i{font-size:15px}
       <span class="cx bom">v3 · modelo_preco_v3<i>MAE R$ 2,47 mi · R² +0,471</i></span>
     </div>
     <div class="ramo">
-      <span class="cx top">v4 · modelo_preco_arvore<i>BOOSTED_TREE · MAE R$ 1,82 mi · R² +0,556</i></span>
+      <span class="cx top">v4 · modelo_preco_arvore<i>BOOSTED_TREE · MAE ~R$ 1,8–2,2 mi · R² ~0,55–0,65</i></span>
       <span class="cx bom">segmentos_imoveis<i>KMEANS · 4 grupos, sem label</i></span>
     </div>
     <div class="ramo proibido">
@@ -1390,14 +1423,22 @@ body.projecao .mapa .cx i{font-size:15px}
     <tr><td><code>v0</code></td><td>o dado como estava</td><td>R$ 13.835.427</td><td>−0,350</td></tr>
     <tr><td><code>v1</code></td><td>Gold limpa (887 linhas)</td><td>R$ 2.581.138</td><td>+0,298</td></tr>
     <tr><td><code>v3</code></td><td>+ 6 features do título</td><td>R$ 2.469.775</td><td>+0,471</td></tr>
-    <tr><td><code>v4</code></td><td>árvore no lugar da reta</td><td><b>R$ 1.823.401</b></td><td><b>+0,556</b></td></tr>
+    <tr><td><code>v4</code></td><td>árvore no lugar da reta</td><td><b>R$ 1,8–2,2 mi</b></td><td><b>+0,55 a +0,65</b></td></tr>
   </table>
+
+  <div class="alerta">
+    <b>Só a linha do <code>v4</code> muda de um treino para outro.</b> O <code>BOOSTED_TREE</code>
+    tem aleatoriedade no treino, então o seu número vai cair dentro da faixa acima, não em cima
+    de um valor exato. Os modelos <code>v0</code>, <code>v1</code> e <code>v3</code> são
+    <code>LINEAR_REG</code> com <code>AUTO_SPLIT</code>: esses reproduzem dígito por dígito, e é
+    por eles que você confere se o seu pipeline está certo.
+  </div>
 
   <p>Três alavancas, nesta ordem de impacto:</p>
   <ol>
     <li><b>Limpar o dado</b> (v0 → v1) — o erro caiu <b>5,4×</b></li>
     <li><b>Criar feature</b> (v1 → v3) — o R² foi de 0,298 para 0,471, sem coletar nada novo</li>
-    <li><b>Trocar o algoritmo</b> (v3 → v4) — o erro caiu mais 26%, mudando <b>uma palavra</b></li>
+    <li><b>Trocar o algoritmo</b> (v3 → v4) — o erro caiu mais 10 a 25%, mudando <b>uma palavra</b></li>
   </ol>
 
   <div class="pergunta">
@@ -1441,6 +1482,11 @@ body.projecao .mapa .cx i{font-size:15px}
 <span class="k">FROM</span> `SEU_PROJETO.anuncios.gold_texto`;</pre>
   </div>
 
+  <div class="alerta">
+    <b>Este é o treino mais demorado da aula — 4 a 5 minutos.</b> O <code>BOOSTED_TREE</code>
+    treina várias árvores em sequência, uma corrigindo o erro da anterior. Dispare e siga lendo.
+  </div>
+
   <div class="nota">
     <b>Por que a árvore ganha aqui.</b> A <code>LINEAR_REG</code> é uma fórmula só, válida para
     o dataset inteiro: cada +1 m² vale sempre a mesma coisa. A árvore encadeia regras
@@ -1456,10 +1502,12 @@ body.projecao .mapa .cx i{font-size:15px}
         <tr><td><code>v0_dado_como_estava</code></td><td>R$ 13.835.427</td><td>−0,350</td></tr>
         <tr><td><code>v1_gold_limpa</code></td><td>R$ 2.581.138</td><td>+0,298</td></tr>
         <tr><td><code>v3_gold_mais_texto</code></td><td>R$ 2.469.775</td><td>+0,471</td></tr>
-        <tr><td><code>v4_arvore_mesmo_dado</code></td><td><b>R$ 1.823.401</b></td><td><b>+0,556</b></td></tr>
+        <tr><td><code>v4_arvore_mesmo_dado</code></td><td><b>R$ 1,8–2,2 mi</b></td><td><b>+0,55 a +0,65</b></td></tr>
       </table>
       <p>Começo: erra R$ 13,8 milhões e é <b>pior que chutar a média</b>.
-      Fim: erra R$ 1,8 milhão e explica 56% da variação do preço.</p>
+      Fim: erra cerca de <b>R$ 2 milhões</b> e explica <b>por volta de 60%</b> da variação do preço.
+      O intervalo na última linha não é descuido: o <code>BOOSTED_TREE</code> treina com
+      aleatoriedade, e o seu resultado vai cair aí dentro.</p>
     </div>
   </details>
 
@@ -1489,11 +1537,15 @@ body.projecao .mapa .cx i{font-size:15px}
         <tr><td>tem_mobilia</td><td>1.131.424</td><td>quartos</td><td>438.815</td></tr>
         <tr><td>tem_piscina</td><td>1.128.073</td><td>suites</td><td>434.656</td></tr>
         <tr><td>eh_casa</td><td>1.127.408</td><td>bairro</td><td>411.132</td></tr>
-        <tr><td><i>area_util</i></td><td><i>334.058</i></td><td><i>tem_piscina</i></td><td><i>0</i></td></tr>
+        <tr><td><i>area_util</i></td><td><i>334.058</i></td><td><i>uma flag de texto</i></td><td><i>0</i></td></tr>
       </table>
       <p>No linear, as flags de texto estão no topo e a <code>area_util</code> no fim.
-      Na árvore, a <code>area_util</code> domina e a piscina vale <b>zero</b>.
-      <b>As duas leituras estão certas.</b></p>
+      Na árvore, a <code>area_util</code> domina e as flags de texto desabam para o fim da lista —
+      alguma delas chega a valer <b>zero</b>. <b>As duas leituras estão certas.</b></p>
+      <p style="font-size:14px;color:#7d8b9c">A coluna da esquerda (<code>v3</code>, linear) reproduz igual no seu projeto.
+      A da direita vem de <b>um</b> treino da árvore: a ordem do topo se mantém
+      (<code>area_util</code> na frente, <code>garagem</code> em segundo, flags de texto no fim),
+      mas os valores e <i>qual</i> flag zera mudam a cada treino.</p>
       <p>O linear só sabe somar: uma flag booleana é um degrau grande e barato. A árvore
       consegue <b>quebrar</b> a <code>area_util</code> em faixas, então já separa terreno de
       apartamento olhando só o tamanho — e a flag de texto fica redundante.</p>
