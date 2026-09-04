@@ -270,6 +270,12 @@ body.projecao .mapa .cx i{font-size:15px}
   #capa{padding:44px 22px 40px}
   #capa h1{font-size:31px}
 }
+
+#projInput{border:1px solid #c7d0da;border-radius:6px;padding:6px 10px;min-width:190px;
+  font:12.5px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#1c2733;background:#fff}
+#projInput:focus{outline:2px solid #44546A;border-color:#44546A}
+.pj.on{font-weight:700}
+@media print{#projInput{display:none}}
 </style>
 </head>
 <body>
@@ -278,7 +284,7 @@ body.projecao .mapa .cx i{font-size:15px}
   <div class="interno">
     <div class="marca">INF · Instituto de Informática · UFG — Processamento de Dados Massivos 2026.2</div>
     <h1>BigQuery ML<br>O modelo já existe. Ele presta?</h1>
-    <p class="tese">O <code>CREATE MODEL</code> é uma linha. Tudo que decide se ele vale alguma coisa acontece antes dele.</p>
+    <p class="tese">O <code>CREATE MODEL</code> é uma linha de SQL. A qualidade do modelo é decidida nas etapas que vêm antes dele.</p>
     <div class="meta">
       Aula de <b>04/09/2026</b> &nbsp;·&nbsp; Prof. <b>Guilherme</b> &nbsp;·&nbsp;
       Dataset: <b>tb_anuncios_silver</b> (1.000 anúncios, Goiânia) &nbsp;·&nbsp; Guia de estudos e referência para o Trabalho 1
@@ -290,6 +296,8 @@ body.projecao .mapa .cx i{font-size:15px}
   <div class="interno">
     <span class="rot" id="rotulo">0 de 10 etapas</span>
     <div class="prog"><i id="barraProg"></i></div>
+    <input id="projInput" type="text" placeholder="ID do seu projeto GCP" spellcheck="false" autocomplete="off">
+    <button class="acao" id="btnProjeto" title="Substitui SEU_PROJETO em todos os códigos da página">OK</button>
     <button class="acao" id="btnProj" title="Aumenta tudo para projetar em sala">Modo projeção</button>
     <button class="acao" onclick="window.print()" title="Ctrl+P — sai um PDF">Salvar PDF</button>
   </div>
@@ -299,19 +307,20 @@ body.projecao .mapa .cx i{font-size:15px}
 
 <!-- ============================================================ -->
 <section id="s0">
-  <h2><span class="num">0</span>Onde a gente parou</h2>
-  <p class="tese">Em 28/08 você treinou um modelo de verdade, com uma query. E a aula acabou ali.</p>
+  <h2><span class="num">0</span>Ponto de partida — o que já temos</h2>
+  <p class="tese">A aula de 28/08 terminou no primeiro <code>CREATE MODEL</code>. Este material parte exatamente dali: revisar o que foi construído e conferir os resultados.</p>
 
-  <p>Com o Sávio, você construiu o caminho inteiro: <b>raw → bronze → silver</b> nos notebooks,
-  depois a <code>gold_predicao_preco</code>, e por fim rodou um <code>CREATE MODEL</code>.
-  Apareceu <i>"O modelo foi criado"</i> — e ficou uma pergunta no ar:</p>
+  <p>Nas aulas do Sávio foi construído o caminho completo: <b>raw → bronze → silver</b> nos notebooks,
+  depois a <code>gold_predicao_preco</code>, e por fim o <code>CREATE MODEL</code> do
+  <code>modelo_preco_imoveis</code>. O treino terminou sem erro — mas nenhuma métrica foi
+  verificada ainda:</p>
 
   <div class="chave">
     O <code>modelo_preco_imoveis</code> que está no seu projeto... <b>é bom?</b><br>
-    Hoje a aula começa respondendo isso. Em uma query.
+    O material começa respondendo isso, em uma query.
   </div>
 
-  <p>Todo o conteúdo de hoje é o mesmo esqueleto de três comandos, repetido:</p>
+  <p>Todo o conteúdo se apoia no mesmo esqueleto de três comandos:</p>
 
   <div class="bloco">
     <header><span>o esqueleto</span><button onclick="copiar(this)">copiar</button></header>
@@ -320,7 +329,7 @@ body.projecao .mapa .cx i{font-size:15px}
 <span class="f">ML.PREDICT</span>(...)    <span class="c">-- usa</span></pre>
   </div>
 
-  <p>Se em algum momento você se perder no detalhe, volte aqui. É sempre esse desenho.</p>
+  <p>Se em algum momento o detalhe confundir, volte a este esqueleto. É sempre esse desenho.</p>
 
   <h3>O que você precisa ter aberto</h3>
   <ul>
@@ -337,18 +346,29 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <div class="alerta">
-    <b>Os scripts usam <code>SEU_PROJETO</code>.</b> Troque pelo ID do seu projeto em todas
-    as queries (é o único ajuste). Sem a silver no projeto? Plano B: peça o
+    <b>Os códigos usam <code>SEU_PROJETO</code>.</b> Digite o ID do seu projeto GCP no campo
+    da barra do topo e clique em <b>OK</b>: todos os códigos desta página passam a mostrar o
+    seu ID, e o botão <b>copiar</b> já copia a query pronta. Nos arquivos <code>.sql</code>
+    do repositório o ajuste continua manual. Sem a silver no projeto? Plano B: peça o
     <code>tb_anuncios_silver.csv</code> e faça upload direto no BigQuery.
+  </div>
+
+  <div class="nota">
+    <b>Sobre os valores de referência.</b> Todos os números deste material foram medidos sobre
+    o dataset oficial da disciplina — o mesmo <code>anuncios.csv</code> distribuído na Turing,
+    processado pelos notebooks do Sávio. Se a sua silver veio desse mesmo caminho, os
+    resultados devem bater. Se algum número divergir, vale investigar antes de seguir: pode
+    ter havido diferença na carga ou na montagem do dataset. A única variação esperada é no
+    modelo de árvore do bloco 10, que muda um pouco a cada treino.
   </div>
 </section>
 
 <!-- ============================================================ -->
 <section id="s1">
-  <h2><span class="num">1</span>O julgamento do modelo de 28/08<span class="selo mao">mão na massa</span></h2>
-  <p class="tese">Modelo ruim não avisa que é ruim. Você tem que perguntar.</p>
+  <h2><span class="num">1</span>Avaliando o modelo de 28/08<span class="selo mao">mão na massa</span></h2>
+  <p class="tese">Um modelo não avisa quando é ruim. A avaliação é uma etapa explícita — e vem antes de qualquer uso.</p>
 
-  <p>Script: <code>00_avaliar_modelo_de_hoje.sql</code>. Uma query, no modelo que
+  <p>Script: <code>00_avaliar_modelo_de_hoje.sql</code>. Uma query, sobre o modelo que
   <b>você</b> treinou:</p>
 
   <div class="bloco">
@@ -365,23 +385,23 @@ body.projecao .mapa .cx i{font-size:15px}
   </table>
 
   <details class="spoiler">
-    <summary>O que aparece</summary>
+    <summary>Resultado esperado</summary>
     <div class="corpo">
       <ul>
         <li><code>mean_absolute_error</code> ≈ <b>R$ 13.835.427</b>. Treze milhões de erro médio.</li>
         <li><code>r2_score</code> ≈ <b>−0,35</b>. <b>Negativo.</b></li>
       </ul>
       <div class="chave">
-        Você treinou um modelo que é <b>pior do que responder a média</b> para qualquer
-        pergunta. E o <code>CREATE MODEL</code> rodou sem nenhum erro.
+        O modelo é <b>pior do que responder a média</b> para qualquer pergunta.
+        E o <code>CREATE MODEL</code> rodou sem nenhum erro.
       </div>
     </div>
   </details>
 
   <div class="pergunta">
-    <p class="q">A pergunta que estrutura a aula inteira:</p>
+    <p class="q">A pergunta que estrutura o material inteiro:</p>
     <p>De quem é a culpa — <b>do algoritmo ou do dado</b>? O que você faria para melhorar?
-    Anote suas ideias antes de seguir. Elas são, literalmente, a pauta dos próximos blocos.</p>
+    Anote suas ideias antes de seguir: os próximos blocos percorrem exatamente essas frentes.</p>
   </div>
 
   <div class="nota">
@@ -398,15 +418,17 @@ body.projecao .mapa .cx i{font-size:15px}
 
 <!-- ============================================================ -->
 <section id="s2">
-  <h2><span class="num">2</span>A silver mente<span class="selo mao">mão na massa</span></h2>
-  <p class="tese">Pelo livro, limpar é dever da silver. A nossa chegou devendo.</p>
+  <h2><span class="num">2</span>Auditando a silver<span class="selo mao">mão na massa</span></h2>
+  <p class="tese">Pela arquitetura medalhão, limpar é responsabilidade da silver. Antes de retreinar, vale conferir se a nossa cumpriu esse papel.</p>
 
   <p>Na arquitetura medalhão de referência, a limpeza — nulos, outliers, duplicatas — acontece
-  na passagem bronze&nbsp;→&nbsp;silver. A nossa silver chegou estruturada (23 colunas tipadas,
-  zero JSON), mas com essa dívida de ETL em aberto. Script: <code>01_silver_mente.sql</code>.
-  O modelo é pior que chutar a média — três queries mostram o que a tabela escondia.</p>
+  na passagem bronze&nbsp;→&nbsp;silver. A silver construída nos notebooks chegou estruturada
+  (23 colunas tipadas, zero JSON), mas a etapa de limpeza ficou em aberto — pode ter sido
+  decisão do pipeline, pode ter sido um detalhe que passou na montagem do dataset. Script:
+  <code>01_silver_mente.sql</code>. O modelo é pior que chutar a média — três verificações
+  mostram o que a tabela esconde.</p>
 
-  <h3>Mentira 1 — o preço</h3>
+  <h3>Verificação 1 — o preço</h3>
   <div class="bloco">
     <header><span>estatística descritiva</span><button onclick="copiar(this)">copiar</button></header>
 <pre><span class="k">SELECT</span>
@@ -421,7 +443,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O que aparece</summary>
+    <summary>Resultado esperado</summary>
     <div class="corpo">
       <ul>
         <li>Mediana: <b>R$ 9.083.228</b> &nbsp;·&nbsp; Média: <b>R$ 20.638.086</b> — mais que o <b>dobro</b></li>
@@ -431,7 +453,7 @@ body.projecao .mapa .cx i{font-size:15px}
     </div>
   </details>
 
-  <p>Meça o estrago — não estime, meça:</p>
+  <p>Para dimensionar o impacto, meça — não estime:</p>
 
   <div class="bloco">
     <header><span>o número que importa</span><button onclick="copiar(this)">copiar</button></header>
@@ -453,7 +475,7 @@ body.projecao .mapa .cx i{font-size:15px}
     <b>linhas</b> entram na conta; <code>IF</code> dentro do agregado decide quais <b>valores</b>.
   </div>
 
-  <h3>Mentira 2 — a área</h3>
+  <h3>Verificação 2 — a área</h3>
   <div class="bloco">
     <header><span>áreas impossíveis</span><button onclick="copiar(this)">copiar</button></header>
 <pre><span class="k">SELECT</span> bairro, titulo, area_util, area_total, <span class="f">ROUND</span>(preco) <span class="k">AS</span> preco
@@ -480,7 +502,7 @@ body.projecao .mapa .cx i{font-size:15px}
     Quem sabe que uma fazenda não ocupa 63% de Goiânia é <b>você</b>, não ele.
   </div>
 
-  <h3>Mentira 3 — colunas que parecem features e não são</h3>
+  <h3>Verificação 3 — colunas que parecem features e não são</h3>
   <div class="bloco">
     <header><span>as colunas mortas</span><button onclick="copiar(this)">copiar</button></header>
 <pre><span class="k">SELECT</span>
@@ -491,7 +513,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O que aparece</summary>
+    <summary>Resultado esperado</summary>
     <div class="corpo">
       <p><b>1 | 1 | 2.</b> <code>tipo_contrato</code> é 'REAL_ESTATE' nas 1.000 linhas;
       <code>status</code> é 'ACTIVE' nas 1.000; <code>cidade</code> é 999× Goiânia.
@@ -503,14 +525,14 @@ body.projecao .mapa .cx i{font-size:15px}
   </details>
 
   <div class="chave">
-    Três queries, três mentiras, na tabela que o pipeline inteiro aprovou.<br>
+    Três queries, três problemas, na tabela que o pipeline inteiro aprovou.<br>
     <b>Tipar a coluna não conserta o valor que está dentro dela.</b>
   </div>
 
   <label class="check" data-id="c2">
     <input type="checkbox">
     <span><b>Checkpoint 2.</b> As três queries retornaram no meu projeto e eu sei dizer
-    as três mentiras de cabeça: preço, área, colunas mortas/coordenadas.</span>
+    os três problemas de cabeça: preço, área, colunas mortas/coordenadas.</span>
   </label>
 
   <details>
@@ -532,8 +554,8 @@ body.projecao .mapa .cx i{font-size:15px}
   <p class="tese">Gold é processo, não prefixo de nome de tabela.</p>
 
   <p>Script: <code>02_gold_etl.sql</code>. A <code>gold_predicao_preco</code> de 28/08 só removeu
-  NULLs — o imóvel de R$ 1,4 bi e a fazenda passaram direto para o treino. Agora a gente
-  constrói a tabela em que dá para confiar. Três tipos de decisão:</p>
+  NULLs — o imóvel de R$ 1,4 bi e a fazenda passaram direto para o treino. Nesta seção é
+  construída a tabela em que dá para confiar. Três tipos de decisão:</p>
 
   <table>
     <tr><th>Decisão</th><th>Quando</th><th>Exemplo aqui</th></tr>
@@ -605,10 +627,10 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O que aparece</summary>
+    <summary>Resultado esperado</summary>
     <div class="corpo">
       <ul>
-        <li><b>887 anúncios</b> (saíram 113 — 11,3%. Doeu? Elas não eram dado, eram ruído com tipo certo)</li>
+        <li><b>887 anúncios</b> (saíram 113 — 11,3%. As linhas removidas não eram dado, eram ruído com o tipo certo)</li>
         <li>Mediana R$ 8,9 mi · média R$ 10,8 mi — <b>agora próximas</b> (era 2,3× a mediana, virou 1,2×)</li>
         <li>Desvio: R$ 5,6 mi (era R$ 72 mi na silver)</li>
         <li><b>146 comerciais = 16,5%</b></li>
@@ -674,7 +696,7 @@ body.projecao .mapa .cx i{font-size:15px}
   treino distribuído em GPU. Isso é Vertex AI, e é a aula de 02/10.</p>
 
   <div class="nota">
-    Hoje você vai usar <b>quatro</b> linhas dessa tabela: <code>LINEAR_REG</code> (bloco 5),
+    Nesta aula são usadas <b>quatro</b> linhas dessa tabela: <code>LINEAR_REG</code> (bloco 5),
     <code>LOGISTIC_REG</code> (bloco 6), <code>BOOSTED_TREE_REGRESSOR</code> e
     <code>KMEANS</code> (bloco 10). Trocar de família é trocar <b>uma string</b>.
   </div>
@@ -721,7 +743,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O momento da aula</summary>
+    <summary>Resultado esperado — v0 × v1</summary>
     <div class="corpo">
       <table>
         <tr><th></th><th>28/08 (dado como está)</th><th>hoje (Gold)</th></tr>
@@ -766,7 +788,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O que aparece</summary>
+    <summary>Resultado esperado</summary>
     <div class="corpo">
       <p>Medido: <code>eh_comercial</code> 3,62 mi &gt; <code>bairro</code> 3,39 mi &gt;
       <code>area_util</code> 668 mil. Repare: a coluna mais importante do modelo é a que
@@ -801,7 +823,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O que aparece</summary>
+    <summary>Resultado esperado</summary>
     <div class="corpo">
       <p><b>R$ 8.385.718</b> por 180 m² no Bueno. Caro? A mediana da Gold é R$ 8,9 mi —
       o modelo responde no mundo em que foi treinado.</p>
@@ -889,7 +911,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O que aparece</summary>
+    <summary>Resultado esperado</summary>
     <div class="corpo">
       <p>Medido: <b>accuracy 0,953</b> · precision 0,762 · recall 0,842 · ROC AUC 0,959.
       Desta vez o modelo ganha do chute de verdade: 95,3% contra a régua de 83,5% —
@@ -939,7 +961,7 @@ body.projecao .mapa .cx i{font-size:15px}
       <p>Palpite óbvio: quartos, área, preço. Medido: <b>bairro 1,91 &gt; suites 1,28 &gt;
       garagem 0,48</b> — nenhum palpite óbvio no topo. Comercial se concentra em certos
       bairros, e comercial NÃO tem suíte: a <b>ausência</b> de um atributo também é
-      informação. O modelo achou um atalho que a gente não desenhou.</p>
+      informação. O modelo achou um atalho que ninguém desenhou.</p>
     </div>
   </details>
 
@@ -971,7 +993,7 @@ body.projecao .mapa .cx i{font-size:15px}
     piscina, mobiliado — isso justifica valor. <b>Dá pra tirar isso do título?</b>"
   </div>
 
-  <p>Dá. Mas a gente não vai acreditar na hipótese só porque ela é razoável. Vamos
+  <p>Dá. Mas hipótese razoável não é hipótese confirmada: o primeiro passo é
   <b>medir</b> — antes de criar coluna nenhuma.</p>
 
   <h3>Passo 1 — testar a hipótese antes de treinar qualquer coisa</h3>
@@ -990,7 +1012,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O que aparece</summary>
+    <summary>Resultado esperado</summary>
     <div class="corpo">
       <p>Medido: <b>31</b> anúncios com piscina · média <b>R$ 10.035.666</b> ·
       sem piscina <b>R$ 10.788.561</b>.</p>
@@ -1024,7 +1046,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O número da aula</summary>
+    <summary>Resultado esperado — tipo × preço</summary>
     <div class="corpo">
       <table>
         <tr><th>tipo</th><th>anúncios</th><th>mediana do preço</th><th>mediana R$/m²</th></tr>
@@ -1092,7 +1114,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O placar dos três modelos</summary>
+    <summary>Resultado esperado — o placar dos três modelos</summary>
     <div class="corpo">
       <table>
         <tr><th>modelo</th><th>o que mudou</th><th>MAE</th><th>R²</th></tr>
@@ -1118,7 +1140,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>A virada</summary>
+    <summary>Resultado esperado — quem pesou no v3</summary>
     <div class="corpo">
       <p>Medido: <code>bairro</code> 1.168.812 &gt; <code>eh_comercial</code> 1.157.458 &gt;
       <code>tem_mobilia</code> 1.131.424 &gt; <b><code>tem_piscina</code> 1.128.073</b> &gt;
@@ -1174,9 +1196,10 @@ body.projecao .mapa .cx i{font-size:15px}
   <h2><span class="num">8</span>A armadilha<span class="selo ver">acompanhe na tela</span></h2>
   <p class="tese">Métrica boa demais não se comemora, se investiga.</p>
 
-  <p>Script: <code>06_armadilha.sql</code>. No bloco 7 o texto do título nos deu R² 0,47.
-  Funcionou tão bem que a tentação é óbvia: <b>e se a gente for mais fundo no texto?</b>
-  Tem mais coisa escrita ali. É o que qualquer pipeline faria... certo?</p>
+  <p>Script: <code>06_armadilha.sql</code>. No bloco 7 o texto do título levou o R² a 0,47.
+  Funcionou tão bem que a extensão natural seria ir mais fundo no texto — tem mais coisa
+  escrita ali. Este bloco mostra por que esse caminho, sem critério, produz um modelo que
+  parece bom e não serve para nada.</p>
 
   <h3>Passo 1 — minerar o título de novo</h3>
   <p>Alguns anunciantes escrevem o valor no próprio título:</p>
@@ -1209,7 +1232,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O que aparece</summary>
+    <summary>Resultado esperado</summary>
     <div class="corpo">
       <p>Medido: v1 → MAE 2.581.138 / R² 0,298. v2 → MAE 2.595.485 / R² 0,286.
       <b>Empatou</b> — até piorou um fio. A feature só existe em 4% das linhas; diluída no
@@ -1221,11 +1244,11 @@ body.projecao .mapa .cx i{font-size:15px}
   <div class="pergunta">
     <p class="q">Empatou no EVALUATE e o explain diz que a coluna não pesa nada.</p>
     <p>Então ela é inofensiva — pode deixar no modelo?<br>
-    Antes de responder: <b>de onde saiu esse número que a gente extraiu?</b></p>
+    Antes de responder: <b>de onde saiu esse número extraído do título?</b></p>
   </div>
 
-  <h3>A prova do crime</h3>
-  <p>Uma métrica agregada esconde o crime. Basta separar em dois grupos:</p>
+  <h3>Decompondo o erro em dois grupos</h3>
+  <p>A métrica agregada esconde o problema. Basta separar em dois grupos:</p>
 
   <div class="bloco">
     <header><span>decompondo o erro</span><button onclick="copiar(this)">copiar</button></header>
@@ -1241,7 +1264,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O que aparece</summary>
+    <summary>Resultado esperado</summary>
     <div class="corpo">
       <ul>
         <li>Título entregava o preço (<b>36</b> anúncios): MAE <b>R$ 1.608.815</b></li>
@@ -1297,9 +1320,9 @@ body.projecao .mapa .cx i{font-size:15px}
 <!-- ============================================================ -->
 <div class="marco">
   <b>METADE DO CAMINHO</b>
-  <span>Até aqui você construiu o pipeline e treinou os modelos. Daqui em diante o
-  assunto muda: o desenho de tudo junto, o resto do cardápio do BQML, e os projetos
-  de vocês.</span>
+  <span>Até aqui o material construiu o pipeline e treinou os modelos. Daqui em diante o
+  assunto muda: o desenho de tudo junto, o resto do cardápio do BQML e as ideias para o
+  Trabalho 1.</span>
 </div>
 
 <!-- ============================================================ -->
@@ -1386,7 +1409,7 @@ body.projecao .mapa .cx i{font-size:15px}
   <h2><span class="num">10</span>Os modelos prontos do BQML<span class="selo mao">mão na massa</span></h2>
   <p class="tese">Trocar de família de modelo é trocar uma string. O caro é ter chegado até aqui.</p>
 
-  <p>Script: <code>07_modelos_prontos.sql</code>. Até agora a gente mexeu no <b>dado</b>.
+  <p>Script: <code>07_modelos_prontos.sql</code>. Até aqui as melhorias vieram do <b>dado</b>.
   Falta a terceira alavanca: o <b>algoritmo</b>.</p>
 
   <h3>Parte A — árvore no lugar da reta</h3>
@@ -1418,7 +1441,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>O placar final dos quatro modelos</summary>
+    <summary>Resultado esperado — o placar final dos quatro modelos</summary>
     <div class="corpo">
       <table>
         <tr><th>modelo</th><th>MAE</th><th>R²</th></tr>
@@ -1525,7 +1548,7 @@ body.projecao .mapa .cx i{font-size:15px}
   </div>
 
   <details class="spoiler">
-    <summary>Os quatro grupos que ele achou</summary>
+    <summary>Resultado esperado — os quatro grupos</summary>
     <div class="corpo">
       <table>
         <tr><th>seg</th><th>imóveis</th><th>preço mediano</th><th>área med.</th><th>quartos</th><th>vagas</th><th>% comercial</th></tr>
@@ -1638,7 +1661,7 @@ body.projecao .mapa .cx i{font-size:15px}
   <table>
     <tr><th>Arquivo</th><th>Bloco</th></tr>
     <tr><td><code>00_avaliar_modelo_de_hoje.sql</code></td><td>1 — o julgamento do modelo de 28/08</td></tr>
-    <tr><td><code>01_silver_mente.sql</code></td><td>2 — as três mentiras da silver</td></tr>
+    <tr><td><code>01_silver_mente.sql</code></td><td>2 — auditoria da silver</td></tr>
     <tr><td><code>02_gold_etl.sql</code></td><td>3 — cortes justificados + <code>eh_comercial</code></td></tr>
     <tr><td><code>03_regressao.sql</code></td><td>5 — <code>LINEAR_REG</code> sobre a Gold + comparação</td></tr>
     <tr><td><code>04_classificacao.sql</code></td><td>6 — <code>LOGISTIC_REG</code>, alvo derivado do título</td></tr>
@@ -1738,6 +1761,37 @@ body.projecao .mapa .cx i{font-size:15px}
     projecao(!document.body.classList.contains("projecao"));
   });
   if(mem.ler("pdm0409:proj") === "1") projecao(true);
+
+  /* campo de projeto: substitui SEU_PROJETO nos codigos ------------ */
+  document.querySelectorAll("main pre").forEach(function(pre){
+    if(pre.innerHTML.indexOf("SEU_PROJETO") !== -1){
+      pre.innerHTML = pre.innerHTML.replace(/SEU_PROJETO/g, '<span class="pj">SEU_PROJETO</span>');
+    }
+  });
+  var pjs        = Array.prototype.slice.call(document.querySelectorAll(".pj"));
+  var projInput  = document.getElementById("projInput");
+  var btnProjeto = document.getElementById("btnProjeto");
+
+  function aplicarProjeto(v){
+    var id = (v || "").trim().replace(/[^A-Za-z0-9\-_.]/g, "");
+    var mostra = id || "SEU_PROJETO";
+    pjs.forEach(function(s){
+      s.textContent = mostra;
+      s.classList.toggle("on", !!id);
+    });
+    if(id){
+      mem.gravar("pdm0409:projid", id);
+      projInput.value = id;
+      btnProjeto.textContent = "aplicado";
+      setTimeout(function(){ btnProjeto.textContent = "OK"; }, 1400);
+    }
+  }
+  btnProjeto.addEventListener("click", function(){ aplicarProjeto(projInput.value); });
+  projInput.addEventListener("keydown", function(e){
+    if(e.key === "Enter") aplicarProjeto(projInput.value);
+  });
+  var projSalvo = mem.ler("pdm0409:projid");
+  if(projSalvo) aplicarProjeto(projSalvo);
 
   /* atalhos: P projeta, ESC sai ----------------------------------- */
   document.addEventListener("keydown", function(e){
