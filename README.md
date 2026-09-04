@@ -24,6 +24,13 @@ Faça isto **antes da primeira aula prática**, com calma, em casa:
 | 2 | Copiar `.env.example` para `.env` e preencher | raiz do repositório |
 | 3 | Conferir o dataset e o dicionário de dados | [`dados/README.md`](dados/README.md) |
 
+Depois da primeira aula prática, quando quiser ir além do que foi visto em sala:
+
+| | O que é | Onde |
+|---|---|---|
+| Contexto do Trabalho 1 | o dado, os números medidos e as regras que valem nota — feito para colar no seu agente | [`CONTEXTOTRABALHO1.md`](CONTEXTOTRABALHO1.md) |
+| Aprender por conta | a CLI do Google, os laboratórios, a documentação e como usar um agente sem terceirizar o aprendizado | [`docs/03-aprender-por-conta.md`](docs/03-aprender-por-conta.md) |
+
 > **Você não vai gastar dinheiro nesta disciplina.** O BigQuery tem uma camada gratuita permanente muito maior do que tudo que a gente vai fazer aqui, e o dataset tem cerca de 15 MB. O guia de ambiente explica isso em detalhe e ensina a configurar um alerta de orçamento como rede de segurança.
 
 ---

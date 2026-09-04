@@ -32,7 +32,7 @@
     { "id": "v3", "type": "backend", "label": "modelo v3", "sublabel": "erra 2,47 mi", "stage": 3, "row": 3, "tag": "R2 +0,471" },
     { "id": "v2", "type": "security", "label": "modelo v2", "sublabel": "le o preco", "stage": 3, "row": 4, "tag": "NAO FACA" },
     { "id": "comercial", "type": "backend", "label": "modelo_comercial", "sublabel": "residencial?", "stage": 4, "row": 1, "tag": "acerta 95,3%" },
-    { "id": "v4", "type": "backend", "label": "modelo v4", "sublabel": "erra 1,82 mi", "stage": 4, "row": 3, "tag": "R2 +0,556" },
+    { "id": "v4", "type": "backend", "label": "modelo v4", "sublabel": "erra 1,8-2,2 mi", "stage": 4, "row": 3, "tag": "R2 0,55-0,65" },
     { "id": "kmeans", "type": "backend", "label": "segmentos_imoveis", "sublabel": "4 grupos", "stage": 4, "row": 4, "tag": "KMEANS" }
   ],
   "flows": [
@@ -56,7 +56,7 @@
       "items": [
         "Limpar o dado (v0 para v1) derrubou o erro 5,4 vezes",
         "Criar feature de texto (v1 para v3) levou o R2 de 0,298 para 0,471",
-        "Trocar o algoritmo (v3 para v4) cortou mais 26% do erro",
+        "Trocar o algoritmo (v3 para v4) cortou mais 10 a 25% do erro",
         "A alavanca que menos parece ML foi a que mais pagou"
       ]
     },

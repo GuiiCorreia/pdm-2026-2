@@ -1717,6 +1717,50 @@ body.projecao .mapa .cx i{font-size:15px}
   <label class="check" data-id="t6"><input type="checkbox">
     <span><b>6.</b> Meu <code>ML.PREDICT</code> funciona com uma linha <b>nova</b>, que não estava no treino?</span></label>
 
+  <h3>E se eu usar um agente de IA?</h3>
+
+  <p>Use. Mas repare no que ele <b>não</b> consegue fazer: escrever um SQL plausível leva
+  segundos; produzir <code>MAE 2.581.138</code> só acontece se o pipeline estiver de fato
+  certo. É por isso que este material publica os números medidos — eles não são gabarito,
+  são <b>detector de mentira</b>. Se o seu resultado não bate, ou o pipeline está diferente,
+  ou o texto está descrevendo algo que você não rodou.</p>
+
+  <p>E há uma ironia útil: <b>o erro que o agente comete por padrão é exatamente o que esta
+  aula ensina a evitar.</b> Peça "melhore o R² deste modelo" e há uma boa chance de ele
+  colocar <code>titulo</code> como feature do classificador — o mesmo <code>titulo</code>
+  de onde o <code>eh_comercial</code> nasceu (bloco 6). A métrica sobe, o modelo não serve
+  para nada, e a regra 3 do checklist acima reprova. Quem sabe disso é você. Ele não sabe:
+  ele otimiza o que você pediu.</p>
+
+  <p style="text-align:center;margin:22px 0 6px">
+    <a href="agente.html" class="botao-link">Abrir o diagrama: duas formas de usar o agente &rarr;</a>
+  </p>
+  <p style="text-align:center;font-size:14px;color:#7d8b9c;margin-top:0">
+    o mesmo dado e a mesma ferramenta, com dois destinos diferentes
+  </p>
+
+  <table>
+    <tr><th>terceirizar (não aprende)</th><th>usar bem (aprende mais rápido)</th></tr>
+    <tr><td>"faz o trabalho 1 pra mim"</td><td>"critique a minha escolha de features contra as regras 1 a 3"</td></tr>
+    <tr><td>"escreve o SQL"</td><td>"explique por que este <code>JOIN</code> duplicou minhas linhas"</td></tr>
+    <tr><td>"melhora o R²"</td><td>"meu R² subiu de 0,29 para 0,71 — procure vazamento antes de eu comemorar"</td></tr>
+    <tr><td>aceita a resposta</td><td>pede a query, <b>roda</b>, e compara com o número de referência</td></tr>
+  </table>
+
+  <div class="chave">
+    O teste, antes de entregar qualquer coisa:<br>
+    <b>feche o computador</b> e explique em voz alta por que cada filtro do
+    <code>WHERE</code> está lá e o que aconteceria se você o tirasse.<br>
+    Conseguiu, o agente foi ferramenta. Não conseguiu, foi atalho — e o atalho cobra depois.
+  </div>
+
+  <div class="nota">
+    No repositório da disciplina há dois arquivos feitos para isso:
+    <code>CONTEXTOTRABALHO1.md</code> (o dado, os números medidos e as regras, prontos para
+    colar no seu agente) e <code>docs/03-aprender-por-conta.md</code> (o <code>gcloud</code>
+    e o <code>bq</code> no terminal, os laboratórios do Google e a documentação oficial).
+  </div>
+
   <h3>Scripts da aula</h3>
   <table>
     <tr><th>Arquivo</th><th>Bloco</th></tr>
@@ -1730,6 +1774,7 @@ body.projecao .mapa .cx i{font-size:15px}
     <tr><td><code>06_armadilha.sql</code></td><td>8 — vazamento de alvo</td></tr>
     <tr><td><code>07_modelos_prontos.sql</code></td><td>10 — <code>BOOSTED_TREE</code> e <code>KMEANS</code></td></tr>
     <tr><td><code>material/pipeline.html</code></td><td>9 — o desenho de tudo, para projetar</td></tr>
+    <tr><td><code>material/agente.html</code></td><td>11 — as duas formas de usar um agente</td></tr>
   </table>
 
   <h3>Para onde isso vai</h3>

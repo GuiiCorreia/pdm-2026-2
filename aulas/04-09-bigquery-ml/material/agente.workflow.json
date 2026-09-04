@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Duas formas de usar o agente",
+    "subtitle": "Mesmo dado, mesma ferramenta, dois destinos",
+    "animation": "trace",
+    "visual_preset": "signal-flow",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "atalho",
+        "label": "O atalho",
+        "focus": ["pede_a", "gera_a", "sobe_a", "reprova_a"],
+        "note": "Pedir o resultado pronto. O agente otimiza o que voce pediu, e ele nao sabe o que voce sabe."
+      },
+      {
+        "id": "ferramenta",
+        "label": "A ferramenta",
+        "focus": ["pede_b", "justifica_b", "roda_b", "confere_b"],
+        "note": "Pedir critica em vez de resposta. Voce roda, confere contra o numero de referencia e decide."
+      },
+      {
+        "id": "saida",
+        "label": "A saida",
+        "focus": ["sobe_a", "confere_b"],
+        "note": "Da para trocar de caminho a qualquer momento: metrica boa demais nao se comemora, se investiga."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "atalho", "label": "Terceirizar", "variant": "exception" },
+    { "id": "ferramenta", "label": "Usar como ferramenta" }
+  ],
+  "phases": [
+    { "id": "pedido", "label": "O pedido", "fromCol": 0, "toCol": 0 },
+    { "id": "trabalho", "label": "O trabalho", "fromCol": 1, "toCol": 3, "variant": "emphasis" },
+    { "id": "desfecho", "label": "O desfecho", "fromCol": 5, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["pede_b", "justifica_b", "roda_b", "confere_b"],
+  "nodes": [
+    { "id": "pede_a", "lane": "atalho", "col": 0, "type": "external", "label": "Faz pra mim", "sublabel": "sem contexto" },
+    { "id": "gera_a", "lane": "atalho", "col": 1, "type": "security", "label": "SQL plausivel", "sublabel": "em segundos" },
+    { "id": "sobe_a", "lane": "atalho", "col": 3, "type": "security", "label": "Metrica sobe", "sublabel": "releu a sua regex", "tag": "regra 3" },
+    { "id": "reprova_a", "lane": "atalho", "col": 5, "type": "security", "label": "Reprova", "sublabel": "sem saber por que" },
+    { "id": "pede_b", "lane": "ferramenta", "col": 0, "type": "external", "label": "Critique isto", "sublabel": "com o contexto" },
+    { "id": "justifica_b", "lane": "ferramenta", "col": 1, "type": "backend", "label": "Justifique", "sublabel": "coluna por coluna" },
+    { "id": "roda_b", "lane": "ferramenta", "col": 3, "type": "backend", "label": "Voce roda", "sublabel": "o agente nao ve" },
+    { "id": "confere_b", "lane": "ferramenta", "col": 5, "type": "database", "label": "Confere", "sublabel": "MAE 2.581.138", "tag": "detector" }
+  ],
+  "edges": [
+    { "id": "a1", "from": "pede_a", "to": "gera_a", "variant": "dashed" },
+    { "id": "a2", "from": "gera_a", "to": "sobe_a", "variant": "security", "role": "error" },
+    { "id": "a3", "from": "sobe_a", "to": "reprova_a", "variant": "security", "role": "error" },
+    { "id": "b1", "from": "pede_b", "to": "justifica_b", "variant": "emphasis" },
+    { "id": "b2", "from": "justifica_b", "to": "roda_b", "variant": "emphasis" },
+    { "id": "b3", "from": "roda_b", "to": "confere_b", "variant": "emphasis" },
+    { "id": "saida", "from": "sobe_a", "to": "roda_b", "label": "boa demais? investigue", "variant": "emphasis", "role": "branch", "fromSide": "bottom", "toSide": "top", "route": "drop", "labelSegment": 1, "labelAt": [430, 168] }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "O que o agente nao consegue fazer",
+      "items": [
+        "Escrever SQL plausivel: segundos",
+        "Produzir MAE 2.581.138: so rodando",
+        "Os numeros medidos sao detector de mentira",
+        "Ele nao ve o seu dado nem executa a sua query"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "O erro que ele comete por padrao",
+      "items": [
+        "Pedir 'melhore o R2' convida ao vazamento",
+        "titulo vira feature de um alvo que veio de regex",
+        "Metrica perfeita, utilidade zero",
+        "Quem sabe disso e voce, nao ele"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "O teste de uma pergunta so",
+      "items": [
+        "Feche o computador",
+        "Explique cada filtro do WHERE em voz alta",
+        "Conseguiu: foi ferramenta",
+        "Nao conseguiu: foi atalho, e o atalho cobra depois"
+      ]
+    }
+  ]
+}
