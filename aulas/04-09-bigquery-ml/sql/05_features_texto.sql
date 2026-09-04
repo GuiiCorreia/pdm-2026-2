@@ -34,8 +34,6 @@ FROM `SEU_PROJETO.anuncios.anuncios_gold`;
 
 -- RESULTADO MEDIDO:  31  |  10.035.666  |  10.788.561
 --
--- [PARE AQUI. Deixe a turma ler o numero.]
---
 -- Imovel COM piscina no titulo e, em media, MAIS BARATO que imovel
 -- sem. A hipotese mais obvia do mundo — "piscina valoriza" — sai
 -- NEGATIVA no teste bruto.

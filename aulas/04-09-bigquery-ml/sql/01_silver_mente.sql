@@ -1,6 +1,6 @@
 -- =====================================================================
 -- PDM 2026.2 — Aula 04/09 — BigQuery ML
--- SCRIPT 1: A SILVER MENTE
+-- SCRIPT 1: AUDITORIA DA SILVER
 -- =====================================================================
 --
 -- Voce construiu essa tabela com o Savio: raw -> bronze -> silver.
@@ -10,12 +10,15 @@
 --
 -- A tese deste script (e da aula):
 --
---     PELO LIVRO, LIMPAR E DEVER DA SILVER. A NOSSA CHEGOU DEVENDO.
---
 --     Na arquitetura medalhao de referencia, a limpeza (nulos,
 --     outliers, duplicatas) acontece na passagem bronze -> silver.
---     A nossa silver esta estruturada, 23 colunas tipadas — mas
---     tipar a coluna nao conserta o valor que esta dentro dela.
+--     Esta silver esta estruturada, 23 colunas tipadas, mas a etapa
+--     de limpeza ficou em aberto — e tipar a coluna nao conserta o
+--     valor que esta dentro dela.
+--
+--     Antes de treinar qualquer modelo, confira se os numeros que
+--     aparecem aqui batem com os do material. Se divergirem, vale
+--     investigar a carga antes de seguir.
 --
 -- COMO USAR: troque SEU_PROJETO pelo id do seu projeto GCP.
 -- O dataset criado nos notebooks do Savio chama `anuncios`.
@@ -23,7 +26,7 @@
 
 
 -- ---------------------------------------------------------------------
--- MENTIRA 1 — O preco (estatistica descritiva basica)
+-- VERIFICACAO 1 — O preco (estatistica descritiva basica)
 -- ---------------------------------------------------------------------
 -- Comece pelo mais simples que existe. E ja aparece o problema.
 
@@ -123,7 +126,7 @@ WHERE preco IS NOT NULL;
 --   "WHERE decide quais LINHAS entram na conta.
 --    IF por dentro do agregado decide quais VALORES entram."
 --
--- Pergunta para a turma:
+-- Para pensar:
 --   se em vez de NULL o IF devolvesse 0, o que acontecia com o
 --   desvio_sem_eles? (resposta: viria errado — as 29 linhas
 --   continuariam na conta, valendo zero. NULL e "nao existe".
@@ -143,7 +146,7 @@ WHERE preco IS NOT NULL;
 
 
 -- ---------------------------------------------------------------------
--- MENTIRA 2 — A fazenda do tamanho de meio Goiania
+-- VERIFICACAO 2 — A fazenda do tamanho de meio Goiania
 -- ---------------------------------------------------------------------
 SELECT
   bairro,
@@ -179,7 +182,7 @@ FROM `SEU_PROJETO.anuncios.tb_anuncios_silver`;
 
 
 -- ---------------------------------------------------------------------
--- MENTIRA 3 — Colunas que parecem features e nao sao
+-- VERIFICACAO 3 — Colunas que parecem features e nao sao
 -- ---------------------------------------------------------------------
 -- Parte A: as colunas mortas.
 
@@ -230,17 +233,16 @@ LIMIT 10;
 -- ---------------------------------------------------------------------
 -- FECHAMENTO DO BLOCO
 -- ---------------------------------------------------------------------
--- Tres queries, tres mentiras, na tabela que o pipeline inteiro
+-- Tres queries, tres problemas, na tabela que o pipeline inteiro
 -- aprovou:
 --
 --   1. Preco:  29 linhas (2,9%) seguram 90% do desvio padrao.
 --   2. Area:   uma "fazenda" de 63% de Goiania, 83 areas impossiveis.
 --   3. Schema: 3 colunas mortas + coordenadas trocadas e faltando.
 --
---   "PELO LIVRO, ESSA LIMPEZA ERA DEVER DA SILVER. A NOSSA CHEGOU
---    DEVENDO — e dado que passa sujo por uma camada nao se conserta
---    sozinho na seguinte. O proximo script paga a divida e constroi
---    a tabela em que da para confiar."
+-- Pelo livro, essa limpeza era etapa da silver. Dado que passa sujo
+-- por uma camada nao se conserta sozinho na seguinte: o proximo
+-- script paga essa divida e constroi a tabela em que da para confiar.
 
 
 -- ---------------------------------------------------------------------

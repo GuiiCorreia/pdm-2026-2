@@ -315,6 +315,14 @@ body.projecao .mapa .cx i{font-size:15px}
   <code>modelo_preco_imoveis</code>. O treino terminou sem erro — mas nenhuma métrica foi
   verificada ainda:</p>
 
+  <div class="nota">
+    <b>Revisão da arquitetura medalhão.</b> Antes de olhar o modelo, vale retomar o desenho que
+    organiza tudo isso: o que cada camada — <b>bronze</b>, <b>silver</b> e <b>gold</b> — se
+    compromete a entregar, e o que acontece quando uma delas não cumpre a sua parte. O diagrama
+    está em <a href="medallion.html">medallion.html</a>, com as três camadas, os consumidores da
+    gold e a dívida de limpeza que esta base carrega.
+  </div>
+
   <div class="chave">
     O <code>modelo_preco_imoveis</code> que está no seu projeto... <b>é bom?</b><br>
     O material começa respondendo isso, em uma query.
@@ -1660,7 +1668,8 @@ body.projecao .mapa .cx i{font-size:15px}
   <h3>Scripts da aula</h3>
   <table>
     <tr><th>Arquivo</th><th>Bloco</th></tr>
-    <tr><td><code>00_avaliar_modelo_de_hoje.sql</code></td><td>1 — o julgamento do modelo de 28/08</td></tr>
+    <tr><td><code>material/medallion.html</code></td><td>0 — revisão da arquitetura medalhão</td></tr>
+    <tr><td><code>00_avaliar_modelo_de_hoje.sql</code></td><td>1 — avaliação do modelo de 28/08</td></tr>
     <tr><td><code>01_silver_mente.sql</code></td><td>2 — auditoria da silver</td></tr>
     <tr><td><code>02_gold_etl.sql</code></td><td>3 — cortes justificados + <code>eh_comercial</code></td></tr>
     <tr><td><code>03_regressao.sql</code></td><td>5 — <code>LINEAR_REG</code> sobre a Gold + comparação</td></tr>

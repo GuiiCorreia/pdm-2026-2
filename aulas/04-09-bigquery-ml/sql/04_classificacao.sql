@@ -86,7 +86,7 @@ FROM `SEU_PROJETO.anuncios.anuncios_gold`;
 --   "Se o rotulo veio de uma coluna, essa coluna esta proibida
 --    de entrar no modelo."
 --
---   (E se a gente quebrar essa regra de proposito? Script 5.)
+--   (E se essa regra for quebrada de proposito? Script 6.)
 -- =====================================================================
 
 

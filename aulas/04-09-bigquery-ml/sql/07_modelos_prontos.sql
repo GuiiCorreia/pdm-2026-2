@@ -1,15 +1,15 @@
 -- =====================================================================
 -- AULA 04/09 — SCRIPT 7: O cardapio do BigQuery ML
 -- =====================================================================
--- Ate aqui a gente melhorou o modelo mexendo no DADO:
+-- Ate aqui as melhorias vieram do DADO:
 --   limpou (v0 -> v1) e criou feature de texto (v1 -> v3).
 --
 -- Falta a terceira alavanca: trocar o ALGORITMO.
 -- No BigQuery ML isso e UMA PALAVRA no OPTIONS. Nao muda uma linha
 -- do SELECT, nao muda a tabela, nao instala nada.
 --
--- E depois disso a gente vai fazer uma coisa diferente: treinar um
--- modelo SEM label nenhum, so pra ver que grupos existem no mercado.
+-- E na parte B, uma coisa diferente: treinar um modelo SEM label
+-- nenhum, so para ver que grupos existem no mercado.
 --
 -- Troque SEU_PROJETO pelo ID do seu projeto em todas as queries.
 -- ---------------------------------------------------------------------
@@ -116,11 +116,11 @@ ORDER BY r2_score;
 --   Comeco: erra R$ 13,8 milhoes e e PIOR que chutar a media.
 --   Fim:    erra R$ 1,8 milhao e explica 56% da variacao do preco.
 --
--- [NOTA DE CONDUCAO: peca pra turma dizer QUAL das tres alavancas deu
---  o maior ganho. Todo mundo aposta na troca de modelo, porque e a
---  que parece "de ML". Foi a limpeza, de longe, e ela e a que ninguem
---  quer fazer. Sem a gold, a arvore treinava no dado de R$ 1,4 bilhao
---  e ia mal do mesmo jeito. Algoritmo bom nao salva dado ruim.]
+-- Para pensar: qual das tres alavancas deu o maior ganho?
+--  A aposta natural e a troca de modelo, porque e a que parece "de
+--  ML". Foi a limpeza, de longe — e ela e a que ninguem quer fazer.
+--  Sem a gold, a arvore treinaria no dado de R$ 1,4 bilhao e iria
+--  mal do mesmo jeito. Algoritmo bom nao salva dado ruim.
 -- ---------------------------------------------------------------------
 
 
@@ -177,7 +177,7 @@ ORDER BY attribution DESC;
 -- =====================================================================
 -- PARTE B — Treinar sem resposta: KMEANS
 -- =====================================================================
--- Tudo que a gente fez ate agora foi APRENDIZADO SUPERVISIONADO:
+-- Tudo ate aqui foi APRENDIZADO SUPERVISIONADO:
 -- existia uma coluna certa (preco, eh_comercial) e o modelo tentava
 -- acertar ela.
 --
@@ -279,10 +279,10 @@ ORDER BY preco_mediano;
 --  e so um punhado de outliers. Cluster pequeno demais nao e
 --  descoberta, e sobra. Olhe o COUNT antes de escrever a conclusao.
 --
--- [NOTA DE CONDUCAO: pergunte pra turma que nome dariam pro segmento 4
---  ANTES de mostrar a leitura. Alguem vai dizer "terreno". A partir
---  dai a ficha cai sozinha: o modelo achou o tipo de imovel sem
---  ninguem etiquetar nada.]
+-- Para pensar: que nome voce daria ao segmento 4 antes de ler a
+--  interpretacao acima? A resposta provavel e "terreno" — e o ponto
+--  e esse: o modelo achou o tipo de imovel sem ninguem etiquetar
+--  nada.
 -- ---------------------------------------------------------------------
 
 

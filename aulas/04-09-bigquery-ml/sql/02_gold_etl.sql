@@ -3,9 +3,9 @@
 -- SCRIPT 2: CONSTRUIR A GOLD
 -- =====================================================================
 --
--- A silver mente (script 1 provou). Agora a gente constroi a tabela
--- em que da para confiar: a camada GOLD — dado pronto para CONSUMO,
--- neste caso, consumo por um modelo.
+-- A auditoria do script 1 mostrou o que a silver esconde. Este script
+-- constroi a tabela em que da para confiar: a camada GOLD — dado
+-- pronto para CONSUMO, neste caso, consumo por um modelo.
 --
 -- Tres tipos de decisao aparecem aqui, e e importante separa-los:
 --
@@ -13,7 +13,7 @@
 --   CONSERTAR valor errado e corrigivel (coordenadas trocadas)
 --   DERIVAR   coluna nova nasce de coluna velha (eh_comercial, preco_m2)
 --
--- COMO USAR: troque SEU_PROJETO. Requer o script 1 ja discutido.
+-- COMO USAR: troque SEU_PROJETO. Requer o script 1 ja executado.
 -- =====================================================================
 
 
@@ -93,7 +93,7 @@ SELECT
   -- DERIVAR 2: so e segura DEPOIS dos filtros la embaixo.
   ROUND(preco / area_util, 2) AS preco_por_m2,
 
-  -- Carregada de proposito. Vai dar problema. Spoiler: script 5.
+  -- Mantida de proposito: e a materia-prima dos scripts 5 e 6.
   titulo
 
 FROM `SEU_PROJETO.anuncios.tb_anuncios_silver`
@@ -124,10 +124,10 @@ WHERE
 -- O CONSERTO (CASE) — a diferenca entre cortar e corrigir:
 --
 --   As 2 linhas de coordenada trocada NAO foram jogadas fora,
---   porque o erro e reversivel: a gente SABE o valor certo (e o
---   outro campo). Regra pratica: erro reversivel se conserta,
---   erro irreversivel se corta. O preco de R$ 1,4 bi a gente NAO
---   sabe consertar — era 1,4 milhao? 140 mil? — entao corta.
+--   porque o erro e reversivel: o valor certo esta no outro campo.
+--   Regra pratica: erro reversivel se conserta, erro irreversivel
+--   se corta. O preco de R$ 1,4 bi nao da para consertar — era 1,4
+--   milhao? 140 mil? — entao sai.
 --
 -- AS DERIVADAS (SELECT):
 --
@@ -149,7 +149,7 @@ WHERE
 --   area_total                     redundante com area_util e mais
 --                                  suja (desafio 2 do script 1).
 --
--- Pergunta para a turma antes de seguir:
+-- Para pensar antes de seguir:
 --   os cortes de preco e area sao regras de negocio disfarcadas de
 --   SQL. Quem, numa empresa de verdade, deveria assinar embaixo do
 --   "50 milhoes" — voces ou a area de negocio?
@@ -172,8 +172,8 @@ SELECT
 FROM `SEU_PROJETO.anuncios.anuncios_gold`;
 
 -- RESULTADO ESPERADO:
---   anuncios       887   (sairam 113 linhas — 11,3% do dado. Doeu?
---                         Elas nao eram dado, eram ruido com tipo certo)
+--   anuncios       887   (sairam 113 linhas — 11,3% do dado; nao eram
+--                         dado, eram ruido com o tipo certo)
 --   mediana        R$  8.900.000
 --   media          R$ 10.762.248   <<< media e mediana proximas AGORA
 --   desvio         R$  5.629.269   (era 72 milhoes na silver)
@@ -183,9 +183,9 @@ FROM `SEU_PROJETO.anuncios.anuncios_gold`;
 -- A distribuicao ficou honesta. E isso que a Gold e.
 --
 -- FECHAMENTO DO BLOCO — e a tese da aula:
---   "Isso que a gente acabou de fazer tem nome: ETL, camada Gold.
---    Nao e a parte chata antes do ML.
---    E a parte que decide se o ML vai servir pra alguma coisa."
+--   O que este script faz tem nome: ETL, camada Gold. Nao e a parte
+--   chata antes do ML. E a parte que decide se o ML vai servir para
+--   alguma coisa.
 
 
 -- ---------------------------------------------------------------------

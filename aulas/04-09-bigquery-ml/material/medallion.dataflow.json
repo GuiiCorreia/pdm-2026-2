@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Arquitetura medalhao — o que cada camada promete entregar",
+    "output": "aulas/04-09-bigquery-ml/material/medallion.html",
+    "quality_profile": "showcase",
+    "animation": "trace",
+    "views": [
+      {
+        "id": "camadas",
+        "label": "As tres camadas",
+        "focus": [
+          "fonte",
+          "bronze",
+          "silver",
+          "gold"
+        ],
+        "note": "Cada camada tem um contrato proprio: bronze guarda, silver estrutura e limpa, gold aplica a regra de negocio."
+      },
+      {
+        "id": "consumo",
+        "label": "Quem consome a gold",
+        "focus": [
+          "gold",
+          "modelos",
+          "analise"
+        ],
+        "note": "A gold e a unica camada que outras equipes leem. Tudo que estiver errado nela vira decisao errada."
+      },
+      {
+        "id": "divida",
+        "label": "A divida desta base",
+        "focus": [
+          "silver",
+          "divida",
+          "gold"
+        ],
+        "note": "Quando a limpeza nao acontece na silver, ela nao desaparece: reaparece como retrabalho na camada seguinte."
+      }
+    ],
+    "viewBox": [
+      1080,
+      620
+    ]
+  },
+  "stages": [
+    {
+      "label": "Fonte"
+    },
+    {
+      "label": "Bronze"
+    },
+    {
+      "label": "Silver"
+    },
+    {
+      "label": "Gold"
+    },
+    {
+      "label": "Consumo"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "fonte",
+      "type": "cloud",
+      "label": "Sistema de origem",
+      "sublabel": "CSV, API, banco",
+      "stage": 0,
+      "row": 1,
+      "tag": "dado como veio"
+    },
+    {
+      "id": "bronze",
+      "type": "database",
+      "label": "Bronze",
+      "sublabel": "copia fiel",
+      "stage": 1,
+      "row": 1,
+      "tag": "nao transforma"
+    },
+    {
+      "id": "silver",
+      "type": "database",
+      "label": "Silver",
+      "sublabel": "tipada e limpa",
+      "stage": 2,
+      "row": 1,
+      "tag": "um fato por linha"
+    },
+    {
+      "id": "divida",
+      "type": "security",
+      "label": "Limpeza em aberto",
+      "sublabel": "outliers passaram",
+      "stage": 2,
+      "row": 3,
+      "tag": "nesta base"
+    },
+    {
+      "id": "gold",
+      "type": "database",
+      "label": "Gold",
+      "sublabel": "regra de negocio",
+      "stage": 3,
+      "row": 1,
+      "tag": "pronta para consumo"
+    },
+    {
+      "id": "modelos",
+      "type": "backend",
+      "label": "Modelos",
+      "sublabel": "BigQuery ML",
+      "stage": 4,
+      "row": 0,
+      "tag": "CREATE MODEL"
+    },
+    {
+      "id": "analise",
+      "type": "backend",
+      "label": "Analise e BI",
+      "sublabel": "painel e relatorio",
+      "stage": 4,
+      "row": 2,
+      "tag": "decisao"
+    }
+  ],
+  "flows": [
+    {
+      "id": "f-ingestao",
+      "from": "fonte",
+      "to": "bronze",
+      "label": "ingestao",
+      "classification": "sem perder nada",
+      "variant": "default",
+      "route": "straight",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "f-tipagem",
+      "from": "bronze",
+      "to": "silver",
+      "label": "tipar e limpar",
+      "classification": "contrato da silver",
+      "variant": "emphasis",
+      "route": "straight",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "f-pendencia",
+      "from": "bronze",
+      "to": "divida",
+      "label": "o que nao foi limpo",
+      "classification": "divida tecnica",
+      "variant": "dashed",
+      "route": "vertical-channel",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "channelX": 315
+    },
+    {
+      "id": "f-negocio",
+      "from": "silver",
+      "to": "gold",
+      "label": "agregar e derivar",
+      "classification": "contrato da gold",
+      "variant": "emphasis",
+      "route": "straight",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelDy": -32
+    },
+    {
+      "id": "f-retrabalho",
+      "from": "divida",
+      "to": "gold",
+      "label": "vira retrabalho aqui",
+      "classification": "custo adiado",
+      "variant": "security"
+    },
+    {
+      "id": "f-ml",
+      "from": "gold",
+      "to": "modelos",
+      "label": "treino e predicao",
+      "classification": "consumo",
+      "variant": "default"
+    },
+    {
+      "id": "f-bi",
+      "from": "gold",
+      "to": "analise",
+      "label": "consulta",
+      "classification": "consumo",
+      "variant": "default"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "O contrato de cada camada",
+      "items": [
+        "Bronze guarda o bruto sem alterar, para que qualquer erro seja auditavel",
+        "Silver entrega tipo correto, sem duplicata, sem valor impossivel",
+        "Gold responde a uma pergunta de negocio, com as regras ja aplicadas"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Por que a ordem importa",
+      "items": [
+        "A camada seguinte confia na anterior e nao repete a verificacao",
+        "Corrigir na origem custa uma query; corrigir depois custa em todo consumidor",
+        "So a gold e publica: bronze e silver sao area interna do time de dados"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "O que acontece quando a silver deve",
+      "items": [
+        "Dado sujo que passa por uma camada nao se conserta sozinho na seguinte",
+        "O modelo nao acusa o problema: ele treina e devolve uma metrica ruim sem explicacao",
+        "Nesta base a limpeza ficou em aberto, e a aula de hoje paga essa divida na gold"
+      ]
+    }
+  ]
+}

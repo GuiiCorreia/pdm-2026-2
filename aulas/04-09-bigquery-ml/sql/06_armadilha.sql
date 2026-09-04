@@ -1,15 +1,18 @@
 -- =====================================================================
 -- PDM 2026.2 — Aula 04/09 — BigQuery ML
--- SCRIPT 5: A ARMADILHA (demo guiada — professor conduz)
+-- SCRIPT 6: VAZAMENTO DE ALVO — quando a metrica melhora pelo
+--            motivo errado
 -- =====================================================================
 --
--- [NOTA DE CONDUCAO: apresentar como MELHORIA GENUINA. Nao entregar
---  o final. A turma tem que comemorar antes de descobrir.]
+-- No script 5 as flags do titulo levaram o R2 de 0,30 para 0,47:
+-- extrair informacao de texto funcionou. A extensao natural seria ir
+-- mais fundo no mesmo texto — tem mais coisa escrita ali.
 --
--- O modelo de preco errou bastante (script 3). Vamos melhorar.
--- Tem informacao que a gente ainda nao usou: o TEXTO do titulo.
--- Texto e informacao. Extrair informacao de texto e NLP.
--- E o que qualquer pipeline faria... certo?
+-- Este script segue esse caminho ate o fim e mostra por que, sem
+-- criterio, ele produz um modelo com metrica boa e uso nenhum.
+--
+-- Rode os passos na ordem e leia o resultado de cada um antes de
+-- passar para o seguinte.
 --
 -- COMO USAR: troque SEU_PROJETO. Requer anuncios_gold e modelo_preco.
 -- =====================================================================
@@ -72,7 +75,7 @@ FROM `SEU_PROJETO.anuncios.gold_com_titulo`;
 -- RESULTADO ESPERADO (medido):  887  |  36  |  33
 --
 -- Dos 36 titulos com valor parseavel, 33 batem com o preco real.
--- [Deixar a turma reparar nisso SEM comentar. Seguir em frente.]
+-- Guarde esse numero: ele explica o que acontece no passo 4.
 -- (Entre os que nao batem: "R$13 Milhões" — a regex le "13". O texto
 --  ate quando entrega, entrega mentindo. Guarde para o final.)
 
@@ -133,11 +136,12 @@ ORDER BY attribution DESC;
 -- [Perguntar:]
 --   "Empatou no EVALUATE e o explain diz que a coluna nao pesa.
 --    Entao ela e inofensiva — pode deixar no modelo?"
--- [Deixar responderem. ENTAO rodar o passo 4.]
+--
+-- Responda antes de rodar o passo 4.
 
 
 -- ---------------------------------------------------------------------
--- PASSO 4 — A prova do crime
+-- PASSO 4 — Decompondo o erro em dois grupos
 -- ---------------------------------------------------------------------
 -- Agrupe o erro do v2 por "o titulo entregava o preco?":
 

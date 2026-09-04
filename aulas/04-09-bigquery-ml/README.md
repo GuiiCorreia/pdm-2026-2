@@ -1,12 +1,12 @@
 # 04/09 — BigQuery ML
 
-> Na aula passada você treinou um modelo. Hoje a gente descobre se ele presta.
+> Na aula passada você treinou um modelo. Esta aula começa descobrindo se ele presta.
 
 Com o Sávio você fez `raw → bronze → silver` e rodou um `CREATE MODEL` em cima de uma gold. Apareceu **"o modelo foi criado"** e a aula acabou ali.
 
 Ficou uma pergunta no ar: **o modelo é bom?**
 
-A aula de hoje começa respondendo isso — em uma query — e a resposta é ruim. A partir daí, o trabalho todo é consertar. No fim você vai ter, na sua conta, treinados por você:
+A aula começa respondendo isso — em uma query — e a resposta é ruim. A partir daí, o trabalho todo é consertar. No fim você vai ter, na sua conta, treinados por você:
 
 - um diagnóstico honesto do modelo de 28/08 (spoiler: R² **negativo**)
 - uma camada **Gold** construída com critério, não com sorte
@@ -36,7 +36,7 @@ No editor é um "substituir em todos os arquivos". Se esquecer, o BigQuery recla
 
 O material completo da aula está em **[`material/aula-04-09.html`](material/aula-04-09.html)**.
 
-Abra com dois cliques. Funciona offline, não precisa de internet nem de instalar nada. É por ele que a gente vai na aula, alternando com o console do BigQuery.
+Abra com dois cliques. Funciona offline, não precisa de internet nem de instalar nada. É por ele que a aula caminha, alternando com o console do BigQuery.
 
 - botão de **copiar** em cada bloco de SQL
 - **checkpoints** que ficam marcados enquanto você avança
@@ -44,7 +44,10 @@ Abra com dois cliques. Funciona offline, não precisa de internet nem de instala
 - **Ctrl+P / Cmd+P** gera um PDF, se preferir estudar impresso
 - tecla **P** liga o modo de projeção
 
-O diagrama do pipeline inteiro está em **[`material/pipeline.html`](material/pipeline.html)** — a mesma coisa, em uma tela.
+Dois diagramas acompanham o material:
+
+- **[`material/medallion.html`](material/medallion.html)** — a revisão da arquitetura medalhão: o que bronze, silver e gold se comprometem a entregar, quem consome a gold e o que acontece quando uma camada não cumpre a sua parte. É por onde a aula começa.
+- **[`material/pipeline.html`](material/pipeline.html)** — o pipeline inteiro desta aula, do bucket aos quatro modelos comparados, em uma tela.
 
 Ele é o seu guia de estudo depois da aula também. Não é slide.
 
@@ -66,8 +69,6 @@ Rode nesta ordem. Cada um depende do anterior.
 | 7 | [`sql/07_modelos_prontos.sql`](sql/07_modelos_prontos.sql) | árvore no lugar da reta, e um KMeans sem label nenhum |
 
 > Sobre o passo 6: **rode antes de tirar conclusão.** Ele não é o que parece na primeira leitura.
-
-Os arquivos em `sql/_arquivo/` são a versão anterior do material (pré-28/08). Estão ali só como histórico — não rode.
 
 ---
 
@@ -91,7 +92,7 @@ Não são pré-requisito da aula. Se você só quer o Trabalho 1, o `sql/` basta
 
 ## O placar que a aula constrói
 
-Tudo que a gente faz hoje cabe nesta tabela. Ela é o resumo da disciplina inteira:
+Tudo que a aula faz cabe nesta tabela. Ela é o resumo da disciplina inteira:
 
 | modelo | o que mudou | MAE | R² |
 |---|---|---:|---:|
@@ -106,7 +107,7 @@ Três alavancas, nesta ordem de impacto:
 2. **criar feature** (v1 → v3) — o R² subiu de 0,298 para 0,471
 3. **trocar o algoritmo** (v3 → v4) — o erro caiu mais 26%
 
-Todo mundo aposta na terceira. É a primeira que decide o jogo, e é a que ninguém quer fazer.
+A aposta natural é na terceira. É a primeira que decide o jogo, e é a que ninguém quer fazer.
 
 ---
 

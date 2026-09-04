@@ -6,7 +6,7 @@
 -- "O modelo foi criado" e a aula acabou ali.
 --
 -- Pergunta que ficou no ar: o modelo e BOM?
--- Hoje a aula comeca respondendo isso. Em uma query.
+-- Este script responde isso. Em uma query.
 --
 -- Troque SEU_PROJETO pelo ID do seu projeto em todas as queries.
 -- ---------------------------------------------------------------------
@@ -58,11 +58,12 @@ FROM ML.EVALUATE(MODEL `SEU_PROJETO.anuncios.modelo_preco_imoveis`);
 -- (Os numeros exatos variam um pouco entre alunos: o AUTO_SPLIT
 --  sorteia o conjunto de teste. O tamanho do desastre, nao.)
 --
---   "Voces treinaram um modelo que e PIOR do que responder a media
---    para qualquer pergunta. E o CREATE MODEL rodou sem nenhum erro.
---    Modelo ruim nao avisa que e ruim. Voce tem que perguntar."
+-- Leitura: o modelo treinado em 28/08 e PIOR do que responder a media
+-- para qualquer pergunta. E o CREATE MODEL rodou sem nenhum erro.
+-- Um modelo ruim nao avisa que e ruim — a avaliacao e uma etapa
+-- explicita, e alguem precisa executa-la.
 --
--- Pergunta para a turma ANTES de seguir:
---   De quem e a culpa? Do algoritmo ou do dado?
+-- Para pensar antes de seguir:
+--   De quem e a responsabilidade? Do algoritmo ou do dado?
 --
 -- A resposta esta no script 01.

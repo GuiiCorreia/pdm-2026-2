@@ -76,7 +76,7 @@ FROM `SEU_PROJETO.anuncios.anuncios_gold`;
 --        latitude/longitude (37,7% dos anuncios nem tem coordenada;
 --                       o BQ imputaria um valor medio para 1/3 da
 --                       base, inventando um "centro da cidade" falso)
---        titulo        (por que? anote seu palpite. Script 5.)
+--        titulo        (por que? anote seu palpite. Scripts 5 e 6.)
 --
 -- SOBRE OS NULLs QUE FICARAM (condominio, iptu, quartos...):
 --   o BigQuery ML imputa sozinho — numerico vira a media da coluna,
@@ -85,7 +85,7 @@ FROM `SEU_PROJETO.anuncios.anuncios_gold`;
 --   177 condominios "na media" e uma ficcao estatistica. Saber que
 --   a imputacao existe e o que separa usar de ser usado.
 --
--- Pergunta para a turma:
+-- Para pensar:
 --   onde esta o train_test_split neste comando?
 --   (resposta: data_split_method. Voce nao escreve o split, escolhe
 --    a POLITICA — e ela fica gravada no modelo, nao num notebook
@@ -170,7 +170,7 @@ LIMIT 20;
 --   ORDER BY ABS(...) DESC: sem o ABS, o topo mostraria so quem o
 --   modelo subestimou. Erro para cima e para baixo pesa igual.
 --
--- Pergunta para a turma:
+-- Para pensar:
 --   essas linhas estavam no TREINO do modelo. Isso invalida a
 --   analise? (para julgar QUALIDADE, sim — para isso ha o
 --   ML.EVALUATE, que usa a fatia de validacao. Para procurar PADRAO
