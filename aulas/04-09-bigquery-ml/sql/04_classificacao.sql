@@ -31,7 +31,7 @@ FROM `SEU_PROJETO.anuncios.anuncios_gold`;
 
 -- RESULTADO ESPERADO: 83,5%.
 --
--- ESCREVA ESSE NUMERO NO QUADRO. Ele e a regua do bloco:
+-- Anote esse numero: ele e a regua do bloco inteiro.
 --   modelo com acuracia 84% num problema onde chutar da 83,5%
 --   aprendeu quase NADA. Acuracia so faz sentido comparada com
 --   a classe majoritaria.

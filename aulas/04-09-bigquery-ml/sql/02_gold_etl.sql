@@ -176,7 +176,7 @@ FROM `SEU_PROJETO.anuncios.anuncios_gold`;
 --                         dado, eram ruido com o tipo certo)
 --   mediana        R$  8.900.000
 --   media          R$ 10.762.248   <<< media e mediana proximas AGORA
---   desvio         R$  5.629.269   (era 72 milhoes na silver)
+--   desvio         R$  5.632.444   (era 72 milhoes na silver)
 --   comerciais     146 = 16,5%
 --
 -- Compare com o script 1: media 2,3x a mediana ANTES, 1,2x DEPOIS.

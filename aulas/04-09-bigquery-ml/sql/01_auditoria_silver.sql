@@ -64,7 +64,7 @@ WHERE preco IS NOT NULL;
 
 -- RESULTADO ESPERADO (medido na tb_anuncios_silver de 1.000 anuncios):
 --   menor_preco  R$        29.000
---   mediana      R$     9.083.228
+--   mediana      R$     9.076.455
 --   media        R$    20.638.086   <<< mais que o DOBRO da mediana
 --   maior_preco  R$ 1.419.000.000   <<< um imovel de 1,4 BILHAO
 --   desvio       R$    72.087.491

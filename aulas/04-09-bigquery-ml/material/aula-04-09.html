@@ -433,7 +433,7 @@ body.projecao .mapa .cx i{font-size:15px}
   na passagem bronze&nbsp;→&nbsp;silver. A silver construída nos notebooks chegou estruturada
   (23 colunas tipadas, zero JSON), mas a etapa de limpeza ficou em aberto — pode ter sido
   decisão do pipeline, pode ter sido um detalhe que passou na montagem do dataset. Script:
-  <code>01_silver_mente.sql</code>. O modelo é pior que chutar a média — três verificações
+  <code>01_auditoria_silver.sql</code>. O modelo é pior que chutar a média — três verificações
   mostram o que a tabela esconde.</p>
 
   <h3>Verificação 1 — o preço</h3>
@@ -454,7 +454,7 @@ body.projecao .mapa .cx i{font-size:15px}
     <summary>Resultado esperado</summary>
     <div class="corpo">
       <ul>
-        <li>Mediana: <b>R$ 9.083.228</b> &nbsp;·&nbsp; Média: <b>R$ 20.638.086</b> — mais que o <b>dobro</b></li>
+        <li>Mediana: <b>R$ 9.076.455</b> &nbsp;·&nbsp; Média: <b>R$ 20.638.086</b> — mais que o <b>dobro</b></li>
         <li>Maior preço: <b>R$ 1.419.000.000</b>. Um imóvel de 1,4 <b>bilhão</b>.</li>
       </ul>
       <p>Quando média &gt;&gt; mediana, existe outlier. Sempre. Alguém lá em cima está puxando tudo.</p>
@@ -496,7 +496,7 @@ body.projecao .mapa .cx i{font-size:15px}
   <details class="spoiler">
     <summary>O campeão</summary>
     <div class="corpo">
-      <p>Uma "fazenda" com <code>area_util</code> = <b>459.800.000 m²</b>. Isso é 459,8 km² —
+      <p>Uma "área rural" com <code>area_util</code> = <b>459.800.000 m²</b>. Isso é 459,8 km² —
       <b>cerca de 63% do município de Goiânia</b> (~729 km²). Um imóvel à venda ocupando dois
       terços da cidade onde ele está anunciado. Causa: mistura de unidade (m², hectare,
       alqueire) num campo que aceita qualquer número. Ao todo: <b>83 anúncios</b> acima de
@@ -507,7 +507,7 @@ body.projecao .mapa .cx i{font-size:15px}
   <div class="alerta">
     <b>A lição.</b> Nenhum modelo vai te avisar que o número é impossível.
     <code>459800000</code> é um número perfeitamente válido para o BigQuery.
-    Quem sabe que uma fazenda não ocupa 63% de Goiânia é <b>você</b>, não ele.
+    Quem sabe que um imóvel não ocupa 63% de Goiânia é <b>você</b>, não ele.
   </div>
 
   <h3>Verificação 3 — colunas que parecem features e não são</h3>
@@ -1670,7 +1670,7 @@ body.projecao .mapa .cx i{font-size:15px}
     <tr><th>Arquivo</th><th>Bloco</th></tr>
     <tr><td><code>material/medallion.html</code></td><td>0 — revisão da arquitetura medalhão</td></tr>
     <tr><td><code>00_avaliar_modelo_de_hoje.sql</code></td><td>1 — avaliação do modelo de 28/08</td></tr>
-    <tr><td><code>01_silver_mente.sql</code></td><td>2 — auditoria da silver</td></tr>
+    <tr><td><code>01_auditoria_silver.sql</code></td><td>2 — auditoria da silver</td></tr>
     <tr><td><code>02_gold_etl.sql</code></td><td>3 — cortes justificados + <code>eh_comercial</code></td></tr>
     <tr><td><code>03_regressao.sql</code></td><td>5 — <code>LINEAR_REG</code> sobre a Gold + comparação</td></tr>
     <tr><td><code>04_classificacao.sql</code></td><td>6 — <code>LOGISTIC_REG</code>, alvo derivado do título</td></tr>

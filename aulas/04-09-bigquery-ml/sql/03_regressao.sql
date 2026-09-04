@@ -122,7 +122,7 @@ FROM ML.EVALUATE(MODEL `SEU_PROJETO.anuncios.modelo_preco`);
 --   o erro" — e "o que o erro me conta sobre o dado".
 --
 -- RESULTADO MEDIDO (pdm-2026-gui, 28/08 — o AUTO_SPLIT e
--- deterministico no mesmo dado; os alunos devem ver o MESMO numero):
+-- deterministico no mesmo dado, entao voce deve ver o MESMO numero):
 --   mean_absolute_error   2.581.138    (v0 de 28/08: 13.835.427)
 --   r2_score              0,298        (v0 de 28/08: -0,35)
 --
