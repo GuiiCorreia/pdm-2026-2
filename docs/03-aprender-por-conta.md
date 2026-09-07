@@ -4,8 +4,9 @@ Guia de indicações, não de tarefas. Nada aqui vale nota. Serve para quem term
 com a sensação de que dá para ir mais fundo — e quer saber por onde.
 
 Ele fecha a trinca: o [`README`](../README.md) diz o que a disciplina faz, o
-[`CONTEXTOTRABALHO1.md`](../CONTEXTOTRABALHO1.md) descreve o dado e as regras do trabalho, e
-este arquivo aponta para fora, para onde o aprendizado continua sem professor no meio.
+[`CONTEXTOTRABALHO1.md`](../CONTEXTOTRABALHO1.md) traz as regras do Trabalho 1 e o exemplo
+trabalhado da aula, e este arquivo aponta para fora, para onde o aprendizado continua sem
+professor no meio.
 
 ---
 
@@ -102,18 +103,24 @@ Antes de qualquer `push`, a regra do `.env` vale sempre — está explicada no
 
 Esta seção é a mais importante do arquivo.
 
-Um agente escreve SQL plausível em segundos. O que ele **não** consegue fazer é produzir
-`MAE 2.581.138`. Esse número só aparece se o pipeline estiver realmente certo — se a gold
-tiver as 887 linhas certas, com os filtros certos, nas colunas certas. É por isso que este
-material publica os números medidos: eles não são gabarito, são **detector de mentira**. Se
-o seu resultado não bate, ou o seu pipeline está diferente, ou o texto está descrevendo algo
-que você não rodou.
+Um agente escreve SQL plausível em segundos. O que ele **não** consegue fazer é produzir um
+número medido. Na aula, `MAE 2.581.138` só aparece se a gold tiver as 887 linhas certas, com
+os filtros certos, nas colunas certas — por isso o material publica os valores conferidos:
+eles não são gabarito, são **detector de mentira**.
+
+No seu trabalho isso vira outra coisa, e melhor. Como o dataset é do seu grupo, não existe
+número publicado para conferir — o detector passa a ser **a auditoria do seu próprio dado**: a
+mediana, a média, o máximo, quantas colunas mortas, quantas duplicatas, qual a fatia da classe
+majoritária. Esses números o agente não tem como inventar, porque ele não vê o seu dado. E é
+deles que sai a justificativa de cada filtro do seu `WHERE`, que é o que o professor pergunta.
+A lista está na Parte 1 do [`CONTEXTOTRABALHO1.md`](../CONTEXTOTRABALHO1.md).
 
 E tem uma ironia útil aqui: **o erro que o agente comete por padrão é exatamente o que a
 aula ensina a evitar.** Peça a um agente "melhore o R² deste modelo" e há uma boa chance de
-ele incluir `preco_no_titulo`, ou colocar `titulo` como feature do classificador que nasceu
-de uma regex sobre `titulo`. Nos dois casos a métrica sobe e o modelo não serve para nada.
-Quem sabe disso é você. O agente não sabe — ele otimiza o que você pediu.
+ele incluir uma coluna que só existe depois do fato, ou usar como feature justamente a coluna
+de onde você derivou o rótulo — foi o que aconteceu na aula com o `titulo` e o `eh_comercial`.
+Nos dois casos a métrica sobe e o modelo não serve para nada. Quem sabe disso é você. O
+agente não sabe — ele otimiza o que você pediu.
 
 Daí a diferença entre os dois modos de usar:
 
@@ -153,10 +160,10 @@ Ideias que saem do escopo da disciplina e são projeto de verdade:
   acerta muito e erra em silêncio. O BigQuery ML permite gerar embeddings do texto com
   `ML.GENERATE_EMBEDDING` e usar o vetor como feature. É a ponte entre esta disciplina e
   NLP.
-- **Detectar anúncio suspeito por resíduo.** Em vez de prever o preço, olhe onde o modelo
-  erra mais e pergunte por quê. Boa parte dos seus 20 piores erros são duplicatas e
-  anúncios mal preenchidos — ou seja, um modelo de preço vira um detector de qualidade de
-  cadastro.
+- **Detectar registro suspeito por resíduo.** Em vez de usar a predição, olhe onde o modelo
+  erra mais e pergunte por quê. Na aula, boa parte dos 20 piores erros eram duplicatas e
+  anúncios mal preenchidos — ou seja, um modelo de preço virou um detector de qualidade de
+  cadastro. Isso funciona em qualquer dataset, e costuma render mais que ganhar 2% de R².
 - **Rodar o pipeline inteiro por fora do console.** Os scripts `00` a `07` em um `.sh`,
   versionados, reproduzíveis do zero. É o primeiro passo do que a aula de 13/11 vai chamar
   de MLOps.

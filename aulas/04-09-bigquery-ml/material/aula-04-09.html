@@ -1672,9 +1672,20 @@ body.projecao .mapa .cx i{font-size:15px}
   <h2><span class="num">11</span>Ideias para o Trabalho 1 + checklist</h2>
   <p class="tese">Modelo com métrica perfeita será tratado como vazamento até prova em contrário.</p>
 
-  <p>O Trabalho 1 é <b>11/09</b> — daqui a 7 dias. Escolha uma ideia (ou traga a sua),
-  desenvolva sobre o seu dado e apresente ao Sávio. Cada ideia vem com o risco que o
-  professor vai olhar primeiro:</p>
+  <p>O Trabalho 1 é <b>11/09</b>. Ele é sobre o <b>dataset do seu grupo</b> — do arquivo no
+  Cloud Storage até o modelo, passando por bronze, silver e gold. O dado de imóveis desta aula
+  é o exemplo trabalhado; o que atravessa para o seu dado não são as tabelas, é o método.</p>
+
+  <div class="alerta">
+    <b>As cinco etapas que valem nota.</b> (1) ingestão do seu dataset no GCS · (2) bronze ·
+    (3) silver · (4) gold · (5) modelo em BigQuery ML a partir da gold. As etapas 1 a 3 são da
+    aula de <b>21/08</b> do Sávio; as etapas 4 e 5 são as de hoje. Detalhe: no guia de ambiente
+    eu digo que você não precisa subir arquivo nenhum — aquilo vale para a <b>aula</b>, em que
+    o dado é o mesmo para todos. No <b>trabalho</b> é o contrário.
+  </div>
+
+  <p>As ideias abaixo estão escritas sobre o dado de imóveis, porque é o que acabamos de
+  fazer junto. Cada uma vem com o risco que o professor vai olhar primeiro:</p>
 
   <table>
     <tr><th>Ideia</th><th>Alvo / técnica</th><th>Risco a vigiar</th></tr>
@@ -1703,6 +1714,41 @@ body.projecao .mapa .cx i{font-size:15px}
       <td>comparar com o modelo de <code>preco</code> na MESMA métrica</td></tr>
   </table>
 
+  <h3>O que dessas ideias serve para o seu dado</h3>
+
+  <p>Tire o imóvel da frase e sobra o padrão. É o padrão que você leva para o dataset do seu
+  grupo:</p>
+
+  <table>
+    <tr><th>O padrão</th><th>Como fica no seu dado</th></tr>
+    <tr><td><b>Regressão por segmento</b></td>
+      <td>o modelo geral erra igual em todo lugar? Separe por categoria e compare o erro de cada
+      grupo. Onde ele erra mais, tem coisa acontecendo</td></tr>
+    <tr><td><b>Análise de resíduo</b></td>
+      <td>ordene por <code>ABS(erro)</code> e vá olhar os 20 piores. Costumam ser duplicatas,
+      registro mal preenchido ou um subgrupo que o modelo não entende</td></tr>
+    <tr><td><b>Classificação com alvo derivado</b></td>
+      <td>criou o rótulo com <code>CASE WHEN</code> ou regex sobre uma coluna? Então essa coluna
+      fica fora das features. É a regra 3, e é a que mais reprova</td></tr>
+    <tr><td><b>Deduplicação</b></td>
+      <td><code>GROUP BY</code> na chave natural e <code>HAVING COUNT(*) &gt; 1</code>. Duplicata
+      infla o treino e vaza para a avaliação</td></tr>
+    <tr><td><b>Clusterização sem rótulo</b></td>
+      <td><code>KMEANS</code> quando você não tem alvo. Ele devolve grupos; <b>nomear</b> cada um
+      é trabalho seu, e é aí que está a nota</td></tr>
+    <tr><td><b>Trocar o alvo</b></td>
+      <td>prever a razão em vez do valor absoluto (aqui, preço por m² em vez de preço). Às vezes
+      o alvo é que estava difícil, não o modelo</td></tr>
+  </table>
+
+  <div class="chave">
+    Você não tem número publicado para conferir o seu dataset — ninguém mediu ele antes de você.<br>
+    Então o seu detector de mentira é a <b>auditoria do seu próprio dado</b>: mediana, média,
+    máximo, colunas mortas, duplicatas, fatia da classe majoritária.<br>
+    Cada filtro do seu <code>WHERE</code> tem que sair de um desses números. A lista está no
+    <code>CONTEXTOTRABALHO1.md</code>, no repositório.
+  </div>
+
   <h3>Antes de entregar, passe por aqui</h3>
   <label class="check" data-id="t1"><input type="checkbox">
     <span><b>1.</b> Cada coluna que virou feature <b>existiria</b> no momento da predição?</span></label>
@@ -1724,6 +1770,10 @@ body.projecao .mapa .cx i{font-size:15px}
   certo. É por isso que este material publica os números medidos — eles não são gabarito,
   são <b>detector de mentira</b>. Se o seu resultado não bate, ou o pipeline está diferente,
   ou o texto está descrevendo algo que você não rodou.</p>
+
+  <p>No <b>seu</b> dataset não existe número publicado, e aí o detector muda de forma: passa a
+  ser a auditoria que só você pode rodar — mediana, média, máximo, colunas mortas, duplicatas.
+  O agente não consegue inventar nenhum desses, porque ele não vê o seu dado.</p>
 
   <p>E há uma ironia útil: <b>o erro que o agente comete por padrão é exatamente o que esta
   aula ensina a evitar.</b> Peça "melhore o R² deste modelo" e há uma boa chance de ele
