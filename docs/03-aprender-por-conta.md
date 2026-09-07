@@ -112,8 +112,8 @@ No seu trabalho isso vira outra coisa, e melhor. Como o dataset é do seu grupo,
 número publicado para conferir — o detector passa a ser **a auditoria do seu próprio dado**: a
 mediana, a média, o máximo, quantas colunas mortas, quantas duplicatas, qual a fatia da classe
 majoritária. Esses números o agente não tem como inventar, porque ele não vê o seu dado. E é
-deles que sai a justificativa de cada filtro do seu `WHERE`, que é o que o professor pergunta.
-A lista está na Parte 1 do [`CONTEXTOTRABALHO1.md`](../CONTEXTOTRABALHO1.md).
+deles que sai a justificativa de cada filtro do seu `WHERE`. A lista está na Parte 1 do
+[`CONTEXTOTRABALHO1.md`](../CONTEXTOTRABALHO1.md).
 
 E tem uma ironia útil aqui: **o erro que o agente comete por padrão é exatamente o que a
 aula ensina a evitar.** Peça a um agente "melhore o R² deste modelo" e há uma boa chance de
